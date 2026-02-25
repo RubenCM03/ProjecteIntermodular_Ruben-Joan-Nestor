@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" width="420" height="200">
+  <!-- Hull -->
+  <path d="M20 130 L60 108 L380 108 L400 125 L390 150 L50 150 Z" fill="#c8d4e0"/>
+  <!-- Angled bow -->
+  <path d="M20 130 L60 108 L70 108 L35 135 Z" fill="#adbccc"/>
+  <!-- Main deck angled panels -->
+  <polygon points="55,108 380,108 385,102 70,102" fill="#adbccc"/>
+  <!-- Stealth superstructure -->
+  <polygon points="170,102 250,102 235,55 185,55" fill="#9aafc2"/>
+  <polygon points="170,102 185,55 175,55 160,102" fill="#8a9fb5"/>
+  <polygon points="250,102 235,55 248,55 262,102" fill="#8a9fb5"/>
+  <!-- Sensor tower -->
+  <rect x="203" y="38" width="14" height="18" rx="1" fill="#8a9fb5"/>
+  <rect x="198" y="32" width="24" height="7" rx="1" fill="#8a9fb5"/>
+  <!-- Mast -->
+  <line x1="210" y1="32" x2="210" y2="12" stroke="#6a8099" stroke-width="2"/>
+  <line x1="200" y1="20" x2="225" y2="20" stroke="#6a8099" stroke-width="1.5"/>
+  <circle cx="210" cy="12" r="3" fill="#6a8099"/>
+  <!-- VLS hatches fore -->
+  <rect x="85" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="97" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="109" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="121" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="133" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <!-- VLS hatches aft -->
+  <rect x="270" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="282" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <rect x="294" y="99" width="8" height="5" rx="1" fill="#8a9fb5"/>
+  <!-- Bow railgun -->
+  <rect x="30" y="104" width="55" height="5" rx="2" fill="#8a9fb5"/>
+  <rect x="22" y="105" width="12" height="3" rx="1" fill="#8a9fb5"/>
+  <!-- Aft gun -->
+  <rect x="318" y="101" width="40" height="7" rx="2" fill="#8a9fb5"/>
+  <rect x="355" y="103" width="18" height="3" rx="1" fill="#8a9fb5"/>
+  <!-- Helicopter pad -->
+  <rect x="330" y="108" width="55" height="12" fill="#adbccc"/>
+  <line x1="340" y1="114" x2="378" y2="114" stroke="#6a8099" stroke-width="1" opacity="0.6"/>
+  <line x1="359" y1="109" x2="359" y2="119" stroke="#6a8099" stroke-width="1" opacity="0.6"/>
+  <circle cx="359" cy="114" r="7" fill="none" stroke="#6a8099" stroke-width="1" opacity="0.6"/>
+  <!-- Exhaust vents -->
+  <rect x="262" y="92" width="10" height="10" rx="1" fill="#8a9fb5"/>
+  <rect x="275" y="94" width="8" height="8" rx="1" fill="#8a9fb5"/>
+  <!-- Label -->
+  <text x="210" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4a6a85" letter-spacing="3">DESTROYER</text>
+</svg>
