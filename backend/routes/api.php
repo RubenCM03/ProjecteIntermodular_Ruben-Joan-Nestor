@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController; // <- nou
+use App\Http\Controllers\AuthController;
 
 // ==========================================
 // RUTES PÚBLIQUES (No requereixen token)
