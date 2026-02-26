@@ -17,6 +17,7 @@ class Game extends Model
         'max_shots',
         'board_size',
         'ship_config',
+        'time_limit',
         'started_at',
         'finished_at',
     ];
