@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn-start {
+        @apply block bg-[#00008B] rounded-md px-10 py-2 text-white hover:bg-[#000058] font-semibold transition-all cursor-pointer
+    }
+
+
+}
