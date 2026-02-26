@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Enums\UserRole;
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckRole
+{
+    public function handle(Request $request, Closure $next, string $role): mixed
+    {
+        if (!$request->user() || $request->user()->role->value !== $role) {
+            return response()->json([
+                'message' => 'No tens permisos per accedir a aquest recurs'
+            ], 403);
+        }
+
+        return $next($request);
+    }
+}

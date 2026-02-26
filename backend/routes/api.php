@@ -3,38 +3,39 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\ShotController;
 
 // ==========================================
-// RUTES PÚBLIQUES (No requereixen token)
+// RUTES PÚBLIQUES
 // ==========================================
-
-// RUTA GET PÚBLICA PER TEST
-Route::get('/informacio-publica', function () {
-    return response()->json([
-        'success' => true,
-        'message' => 'Aquesta és informació pública. Qualsevol la pot veure.',
-        'data' => [
-            'app_name' => 'La meva API Laravel',
-            'versio' => '1.0',
-            'estat' => 'Funcionant correctament'
-        ]
-    ]);
-});
-
-
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-
 // ==========================================
-// RUTES PROTEGIDES (Requereixen token vàlid)
+// RUTES PROTEGIDES (qualsevol usuari autenticat)
 // ==========================================
-
 Route::middleware('auth:sanctum')->group(function () {
+    // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
-    
-    // Ruta d'exemple per obtenir les dades de l'usuari identificat
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return response()->json($request->user());
+    });
+
+    // ==========================================
+    // RUTES DE PLAYER
+    // ==========================================
+    Route::middleware('role:player')->group(function () {
+        Route::post('/game', [GameController::class, 'create']);
+        Route::get('/game', [GameController::class, 'show']);
+        Route::post('/game/abandon', [GameController::class, 'abandon']);
+        Route::post('/game/shoot', [ShotController::class, 'shoot']);
+    });
+
+    // ==========================================
+    // RUTES D'ADMIN
+    // ==========================================
+    Route::middleware('role:admin')->group(function () {
+        // Aquí afegirem les rutes d'admin al pas següent
     });
 });

@@ -50,4 +50,9 @@ class User extends Authenticatable
             'role' => UserRole::class,
         ];
     }
+
+    public function games()
+    {
+        return $this->hasMany(Game::class);
+    }
 }
