@@ -24,7 +24,6 @@ class GameController extends Controller
         $request->validate([
             'board_size'          => 'integer|min:8|max:15',
             'ships'               => 'array|min:1|max:10',
-            'ships.*.name'        => 'required_with:ships|string|max:50',
             'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
             'time_limit'          => 'nullable|integer|min:60|max:3600',
             'salvo_mode'          => 'boolean',
@@ -43,16 +42,11 @@ class GameController extends Controller
         }
 
         $boardSize  = $request->input('board_size', 10);
-        $shipConfig = $request->input('ships', $this->defaultShipConfig);
-
-        // Validar que els vaixells caben al tauler
-        foreach ($shipConfig as $ship) {
-            if ($ship['size'] >= $boardSize) {
-                return response()->json([
-                    'message' => "El vaixell {$ship['name']} (mida {$ship['size']}) no cap en un tauler de {$boardSize}x{$boardSize}"
-                ], 422);
-            }
-        }
+        $shipConfig = collect($request->input('ships', $this->defaultShipConfig))
+            ->map(fn($ship, $index) => [
+                'name' => $this->defaultShipConfig[$index]['name'] ?? 'Vaixell ' . ($index + 1),
+                'size' => $ship['size'],
+            ])->toArray();
 
         $game = Game::create([
             'user_id'     => $request->user()->id,
