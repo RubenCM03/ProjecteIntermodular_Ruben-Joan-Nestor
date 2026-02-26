@@ -18,6 +18,8 @@ class Game extends Model
         'board_size',
         'ship_config',
         'time_limit',
+        'salvo_mode',
+        'salvo_turn_active',
         'started_at',
         'finished_at',
     ];
@@ -29,6 +31,8 @@ class Game extends Model
             'started_at'  => 'datetime',
             'finished_at' => 'datetime',
             'ship_config' => 'array',
+            'salvo_mode'        => 'boolean',
+            'salvo_turn_active' => 'boolean',
         ];
     }
 

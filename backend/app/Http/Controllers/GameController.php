@@ -27,6 +27,7 @@ class GameController extends Controller
             'ships.*.name'        => 'required_with:ships|string|max:50',
             'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
             'time_limit'          => 'nullable|integer|min:60|max:3600',
+            'salvo_mode'          => 'boolean',
         ]);
 
         // Si el jugador ja té una partida en curs, la retornem
@@ -61,6 +62,8 @@ class GameController extends Controller
             'board_size'  => $boardSize,
             'ship_config' => $shipConfig,
             'time_limit'  => $request->input('time_limit'),
+            'salvo_mode'         => $request->input('salvo_mode', false),
+            'salvo_turn_active'  => false,
             'started_at'  => now(),
         ]);
 
@@ -86,23 +89,23 @@ class GameController extends Controller
             ->where('status', GameStatus::PLAYING)
             ->with('shots')
             ->first();
-    
+
         if (!$game) {
             return response()->json([
                 'message' => 'No tens cap partida en curs'
             ], 404);
         }
-    
+
         // Comprovar si s'ha acabat el temps
         if ($game->time_limit !== null) {
             $elapsed = (int) $game->started_at->diffInSeconds(now());
-        
+
             if ($elapsed >= $game->time_limit) {
                 $game->update([
                     'status'      => GameStatus::LOST,
                     'finished_at' => now(),
                 ]);
-            
+
                 return response()->json([
                     'message'   => 'La partida ha expirat per temps',
                     'game_over' => true,
@@ -110,7 +113,7 @@ class GameController extends Controller
                 ], 200);
             }
         }
-    
+
         return response()->json([
             'game' => $this->formatGame($game),
         ]);
@@ -213,22 +216,23 @@ class GameController extends Controller
     private function formatGame(Game $game): array
     {
         $game->load('shots');
-
         $timeInfo = $this->getTimeInfo($game);
 
         return [
-            'id'          => $game->id,
-            'status'      => $game->status->value,
-            'board_size'  => $game->board_size,
-            'shots_taken' => $game->shots_taken,
-            'max_shots'   => $game->max_shots,
-            'shots_left'  => $game->max_shots - $game->shots_taken,
-            'time_limit'  => $game->time_limit,
-            'time_elapsed' => $timeInfo['elapsed'],
-            'time_left'   => $timeInfo['left'],
-            'started_at'  => $game->started_at,
-            'finished_at' => $game->finished_at,
-            'shots'       => $game->shots->map(fn($s) => [
+            'id'                => $game->id,
+            'status'            => $game->status->value,
+            'board_size'        => $game->board_size,
+            'shots_taken'       => $game->shots_taken,
+            'max_shots'         => $game->max_shots,
+            'shots_left'        => $game->max_shots - $game->shots_taken,
+            'time_limit'        => $game->time_limit,
+            'time_elapsed'      => $timeInfo['elapsed'],
+            'time_left'         => $timeInfo['left'],
+            'salvo_mode'        => $game->salvo_mode,         // 👈
+            'salvo_turn_active' => $game->salvo_turn_active,  // 👈
+            'started_at'        => $game->started_at,
+            'finished_at'       => $game->finished_at,
+            'shots'             => $game->shots->map(fn($s) => [
                 'row'    => $s->row,
                 'col'    => $s->col,
                 'result' => $s->result->value,
