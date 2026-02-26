@@ -12,10 +12,6 @@ class ShotController extends Controller
 {
     public function shoot(Request $request)
     {
-        $request->validate([
-            'row' => 'required|integer|min:0|max:9',
-            'col' => 'required|integer|min:0|max:9',
-        ]);
 
         // Obtenir partida activa
         $game = Game::where('user_id', $request->user()->id)
@@ -27,7 +23,12 @@ class ShotController extends Controller
             return response()->json([
                 'message' => 'No tens cap partida en curs'
             ], 404);
-        }
+        }   
+
+        $request->validate([
+            'row' => "required|integer|min:0|max:" . ($game->board_size - 1),
+            'col' => "required|integer|min:0|max:" . ($game->board_size - 1),
+        ]);
 
         $row = $request->row;
         $col = $request->col;

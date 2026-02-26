@@ -15,6 +15,8 @@ class Game extends Model
         'status',
         'shots_taken',
         'max_shots',
+        'board_size',
+        'ship_config',
         'started_at',
         'finished_at',
     ];
@@ -22,9 +24,10 @@ class Game extends Model
     protected function casts(): array
     {
         return [
-            'status' => GameStatus::class,
-            'started_at' => 'datetime',
+            'status'      => GameStatus::class,
+            'started_at'  => 'datetime',
             'finished_at' => 'datetime',
+            'ship_config' => 'array',
         ];
     }
 

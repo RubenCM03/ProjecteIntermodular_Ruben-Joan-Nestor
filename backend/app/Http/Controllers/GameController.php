@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class GameController extends Controller
 {
     // Configuració dels vaixells
-    private array $shipConfig = [
+    private array $defaultShipConfig = [
         ['name' => 'Portaavions', 'size' => 5],
         ['name' => 'Cuirassat',   'size' => 4],
         ['name' => 'Destructor',  'size' => 3],
@@ -19,9 +19,15 @@ class GameController extends Controller
         ['name' => 'Patrullera',  'size' => 2],
     ];
 
-    // Crear nova partida
     public function create(Request $request)
     {
+        $request->validate([
+            'board_size'          => 'integer|min:8|max:15',
+            'ships'               => 'array|min:1|max:10',
+            'ships.*.name'        => 'required_with:ships|string|max:50',
+            'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
+        ]);
+
         // Si el jugador ja té una partida en curs, la retornem
         $activeGame = Game::where('user_id', $request->user()->id)
             ->where('status', GameStatus::PLAYING)
@@ -30,26 +36,45 @@ class GameController extends Controller
         if ($activeGame) {
             return response()->json([
                 'message' => 'Ja tens una partida en curs',
-                'game' => $this->formatGame($activeGame),
+                'game'    => $this->formatGame($activeGame),
             ], 200);
         }
 
-        // Crear la partida
+        $boardSize  = $request->input('board_size', 10);
+        $shipConfig = $request->input('ships', $this->defaultShipConfig);
+
+        // Validar que els vaixells caben al tauler
+        foreach ($shipConfig as $ship) {
+            if ($ship['size'] >= $boardSize) {
+                return response()->json([
+                    'message' => "El vaixell {$ship['name']} (mida {$ship['size']}) no cap en un tauler de {$boardSize}x{$boardSize}"
+                ], 422);
+            }
+        }
+
         $game = Game::create([
-            'user_id'    => $request->user()->id,
-            'status'     => GameStatus::PLAYING,
+            'user_id'     => $request->user()->id,
+            'status'      => GameStatus::PLAYING,
             'shots_taken' => 0,
-            'max_shots'  => 40,
-            'started_at' => now(),
+            'max_shots'   => $this->calculateMaxShots($boardSize, $shipConfig),
+            'board_size'  => $boardSize,
+            'ship_config' => $shipConfig,
+            'started_at'  => now(),
         ]);
 
-        // Col·locar els vaixells automàticament
-        $this->placeShips($game);
+        $this->placeShips($game, $boardSize, $shipConfig);
 
         return response()->json([
             'message' => 'Partida creada correctament',
             'game'    => $this->formatGame($game),
         ], 201);
+    }
+
+    private function calculateMaxShots(int $boardSize, array $shipConfig): int
+    {
+        // Total de cel·les dels vaixells * 2.5 arrodonit, mínim 20
+        $totalShipCells = array_sum(array_column($shipConfig, 'size'));
+        return max(20, (int) round($totalShipCells * 2.5));
     }
 
     // Obtenir estat de la partida actual
@@ -98,27 +123,27 @@ class GameController extends Controller
     // MÈTODES PRIVATS
     // ==========================================
 
-    private function placeShips(Game $game): void
+    private function placeShips(Game $game, int $boardSize, array $shipConfig): void
     {
-        $board = array_fill(0, 10, array_fill(0, 10, false));
+        $board = array_fill(0, $boardSize, array_fill(0, $boardSize, false));
 
-        foreach ($this->shipConfig as $config) {
-            $placed = false;
+        foreach ($shipConfig as $config) {
+            $placed   = false;
             $attempts = 0;
 
-            while (!$placed && $attempts < 100) {
+            while (!$placed && $attempts < 200) {
                 $attempts++;
                 $orientation = collect(Orientation::cases())->random();
-                
+
                 if ($orientation === Orientation::HORIZONTAL) {
-                    $row = rand(0, 9);
-                    $col = rand(0, 9 - $config['size']);
+                    $row = rand(0, $boardSize - 1);
+                    $col = rand(0, $boardSize - $config['size']);
                 } else {
-                    $row = rand(0, 9 - $config['size']);
-                    $col = rand(0, 9);
+                    $row = rand(0, $boardSize - $config['size']);
+                    $col = rand(0, $boardSize - 1);
                 }
 
-                if ($this->canPlace($board, $row, $col, $config['size'], $orientation)) {
+                if ($this->canPlace($board, $row, $col, $config['size'], $orientation, $boardSize)) {
                     $this->markBoard($board, $row, $col, $config['size'], $orientation);
 
                     Ship::create([
@@ -137,18 +162,17 @@ class GameController extends Controller
         }
     }
 
-    private function canPlace(array $board, int $row, int $col, int $size, Orientation $orientation): bool
+    private function canPlace(array $board, int $row, int $col, int $size, Orientation $orientation, int $boardSize): bool
     {
         for ($i = 0; $i < $size; $i++) {
             $r = $orientation === Orientation::HORIZONTAL ? $row : $row + $i;
             $c = $orientation === Orientation::HORIZONTAL ? $col + $i : $col;
 
-            // Comprovem la cel·la i les seves veïnes
             for ($dr = -1; $dr <= 1; $dr++) {
                 for ($dc = -1; $dc <= 1; $dc++) {
                     $nr = $r + $dr;
                     $nc = $c + $dc;
-                    if ($nr >= 0 && $nr < 10 && $nc >= 0 && $nc < 10 && $board[$nr][$nc]) {
+                    if ($nr >= 0 && $nr < $boardSize && $nc >= 0 && $nc < $boardSize && $board[$nr][$nc]) {
                         return false;
                     }
                 }
@@ -173,6 +197,7 @@ class GameController extends Controller
         return [
             'id'          => $game->id,
             'status'      => $game->status->value,
+            'board_size'  => $game->board_size,
             'shots_taken' => $game->shots_taken,
             'max_shots'   => $game->max_shots,
             'shots_left'  => $game->max_shots - $game->shots_taken,
