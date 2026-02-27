@@ -23,14 +23,6 @@ export default function GameConfig() {
     const [timeLimit, setTimeLimit] = useState(0);
     const [salvoMode, setSalvoMode] = useState(false);
 
-    const updateShip = (id: string, field: "size" | "count", delta: number) => {
-        setShips(prev => prev.map(s => {
-            if (s.id !== id) return s;
-            if (field === "size") return { ...s, size: Math.max(1, Math.min(boardSize - 1, s.size + delta)) };
-            if (field === "count") return { ...s, count: Math.max(0, Math.min(5, s.count + delta)) };
-            return s;
-        }));
-    };
 
     return (
         <div className="relative flex flex-col px-4 pb-16 pt-4">
