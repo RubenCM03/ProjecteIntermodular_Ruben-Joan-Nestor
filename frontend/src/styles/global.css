@@ -2,8 +2,19 @@
 
 @layer components {
     .btn-start {
-        @apply block bg-[#00008B] rounded-md px-10 py-2 text-white hover:bg-[#000058] font-semibold transition-all cursor-pointer
+        @apply block bg-[#00008B] rounded-md px-10 py-2 text-white hover:bg-[#000058] font-semibold transition-all cursor-pointer;
     }
 
+    .btn {
+        @apply font-[Cinzel_Decorative] font-bold text-[.95rem] tracking-[.15em] uppercase px-11 py-3 rounded-full border border-sky-400/45 bg-linear-to-b from-[rgba(14,116,144,.45)] to-[rgba(7,70,100,.65)] text-sky-50 cursor-pointer transition-all duration-300 relative overflow-hidden hover:border-sky-400/75 hover:-translate-y-0.5 animate-[pulseGlow_2.5s_ease-in-out_infinite] before:absolute before:inset-0 before:bg-linear-to-b before:from-white/7 before:to-transparent before:rounded-full before:pointer-events-none;
+    }
+
+    .pill {
+        @apply font-[Cinzel] text-xs tracking-widest px-4 py-1.5 rounded-full border transition-all duration-200 cursor-pointer border-sky-400/18 bg-sky-400/4 text-sky-300/55 hover:border-sky-400/32 hover:text-sky-300
+    }
+
+    .active-pill {
+        @apply font-[Cinzel] text-xs tracking-widest px-4 py-1.5 rounded-full border transition-all duration-200 cursor-pointer border-sky-400/60 bg-sky-400/16 text-sky-50 shadow-[0_0_12px_rgba(56,189,248,.2)]
+    }
 
 }
