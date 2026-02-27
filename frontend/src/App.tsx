@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import Home from "./pages/Home"
 import GameConfig from "./pages/GameConfig"
+import Login from "./pages/Login"
+import Register from "./pages/Register"
 
 const BUBBLES = [
   { w: 8, l: '8%', dur: '9s', del: '0s' },
@@ -57,6 +59,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/game-config" element={<GameConfig />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
         </main>
       </div>
