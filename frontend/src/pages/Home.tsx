@@ -34,7 +34,7 @@ export default function Home() {
             <div className="fade-in-4">
                 <Link
                     to="/game-config"
-                    className="btn-start btn-glow relative group font-cinzel-deco text-white font-bold text-lg px-12 py-4 rounded-full border border-sky-400/50 bg-linear-to-b from-sky-600/40 to-sky-900/60 backdrop-blur-sm hover:from-sky-500/60 hover:to-sky-800/70 hover:border-sky-300/70 transition-all duration-300 tracking-wider uppercase cursor-pointer"
+                    className="btn"
                 >
                     <span className="items-center gap-3">
                         Jugar ara!
