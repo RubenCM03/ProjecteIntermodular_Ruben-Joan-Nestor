@@ -187,7 +187,7 @@ export default function GameConfig() {
                 <div className="flex gap-2 flex-wrap justify-center">
                     {[
                         `${boardSize}×${boardSize}`,
-                        `${ships.reduce((a, s) => a + s.count, 0)} vaixells`,
+                        `${ships.length} vaixells`,
                         ...(timeLimit > 0 ? [`${timeLimit}s / torn`] : []),
                         ...(salvoMode ? [`Mode Salva`] : []),
                     ].map(label => (
