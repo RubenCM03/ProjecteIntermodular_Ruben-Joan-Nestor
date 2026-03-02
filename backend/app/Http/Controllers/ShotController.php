@@ -12,12 +12,6 @@ class ShotController extends Controller
 {
     public function shoot(Request $request)
     {
-        $request->validate([
-            'row' => 'required|integer|min:0|max:9',
-            'col' => 'required|integer|min:0|max:9',
-        ]);
-
-        // Obtenir partida activa
         $game = Game::where('user_id', $request->user()->id)
             ->where('status', GameStatus::PLAYING)
             ->with('ships', 'shots')
@@ -29,10 +23,36 @@ class ShotController extends Controller
             ], 404);
         }
 
+        // Comprovar temps
+        if ($game->time_limit !== null) {
+            $elapsed = (int) $game->started_at->diffInSeconds(now());
+
+            if ($elapsed >= $game->time_limit) {
+                if ($game->status === GameStatus::PLAYING) {
+                    $game->update([
+                        'status'      => GameStatus::LOST,
+                        'finished_at' => now(),
+                    ]);
+                }
+
+                return response()->json([
+                    'message'   => 'Se t\'ha acabat el temps!',
+                    'game_over' => true,
+                    'status'    => GameStatus::LOST->value,
+                    'ships'     => $this->formatShips($game),
+                ], 422);
+            }
+        }
+
+        $request->validate([
+            'row' => "required|integer|min:0|max:" . ($game->board_size - 1),
+            'col' => "required|integer|min:0|max:" . ($game->board_size - 1),
+        ]);
+
         $row = $request->row;
         $col = $request->col;
 
-        // Comprovar si ja s'ha disparat a aquesta cel·la
+        // Comprovar cel·la ja disparada
         $alreadyShot = $game->shots->first(
             fn($s) => $s->row === $row && $s->col === $col
         );
@@ -58,9 +78,7 @@ class ShotController extends Controller
         if (!$hitShip) {
             $result = ShotResult::MISS;
         } else {
-            // Comprovar si el vaixell queda enfonsat
             $hitsOnShip = $this->countHitsOnShip($game, $hitShip, $row, $col);
-
             if ($hitsOnShip >= $hitShip->size) {
                 $result = ShotResult::SUNK;
                 $hitShip->update(['sunk' => true]);
@@ -69,7 +87,7 @@ class ShotController extends Controller
             }
         }
 
-        // Guardar el tir
+        // Guardar tir
         Shot::create([
             'game_id' => $game->id,
             'row'     => $row,
@@ -77,9 +95,23 @@ class ShotController extends Controller
             'result'  => $result,
         ]);
 
-        // Actualitzar comptador
         $game->increment('shots_taken');
         $game->refresh();
+
+        // Lògica SALVO
+        if ($game->salvo_mode) {
+            if ($result === ShotResult::MISS) {
+                // Ha fallat, acaba el torn SALVO
+                $game->update(['salvo_turn_active' => false]);
+                $salvoMessage = 'Has fallat, torn acabat';
+            } else {
+                // Ha tocat o enfonsat, el torn SALVO segueix actiu
+                $game->update(['salvo_turn_active' => true]);
+                $salvoMessage = $result === ShotResult::SUNK
+                    ? 'Vaixell enfonsat! Pots seguir disparant'
+                    : 'Tocat! Pots seguir disparant';
+            }
+        }
 
         // Comprovar fi de partida
         $gameOver = $this->checkGameOver($game, $result);
@@ -89,6 +121,11 @@ class ShotController extends Controller
             'shots_taken' => $game->shots_taken,
             'shots_left'  => $game->max_shots - $game->shots_taken,
         ];
+
+        if ($game->salvo_mode) {
+            $response['salvo_turn_active'] = $game->salvo_turn_active;
+            $response['salvo_message']     = $salvoMessage ?? null;
+        }
 
         if ($result === ShotResult::SUNK) {
             $response['sunk_ship'] = $hitShip->name;
@@ -100,16 +137,7 @@ class ShotController extends Controller
             $response['message']   = $game->status === GameStatus::WON
                 ? '🎉 Has trobat tots els vaixells!'
                 : '💀 Se t\'han acabat els intents!';
-
-            // Revelar posicions dels vaixells al final
-            $response['ships'] = $game->ships->map(fn($s) => [
-                'name'        => $s->name,
-                'size'        => $s->size,
-                'start_row'   => $s->start_row,
-                'start_col'   => $s->start_col,
-                'orientation' => $s->orientation->value,
-                'sunk'        => $s->sunk,
-            ]);
+            $response['ships']     = $this->formatShips($game);
         }
 
         return response()->json($response);
@@ -160,5 +188,17 @@ class ShotController extends Controller
         }
 
         return false;
+    }
+
+    private function formatShips(Game $game): array
+    {
+        return $game->ships->map(fn($s) => [
+            'name'        => $s->name,
+            'size'        => $s->size,
+            'start_row'   => $s->start_row,
+            'start_col'   => $s->start_col,
+            'orientation' => $s->orientation->value,
+            'sunk'        => $s->sunk,
+        ])->toArray();
     }
 }
