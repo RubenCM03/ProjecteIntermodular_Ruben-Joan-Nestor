@@ -8,7 +8,7 @@ import BoardPanel from "../components/Game/BoardPanel";
 import SidePanel from "../components/Game/SidePanel";
 import { gameApi, rowColToCoord } from "../api";
 import type { ApiGame, ShotResponse } from "../api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
 
 function buildBoard(shots: ApiGame["shots"]): Record<string, CellState> {
@@ -29,8 +29,8 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
       s.result === "sunk"
         ? `${coord} → Enfonsat ✓`
         : s.result === "hit"
-        ? `${coord} → Encert`
-        : `${coord} → Aigua`;
+          ? `${coord} → Encert`
+          : `${coord} → Aigua`;
     return { id: i + 1, type, text };
   });
 }
@@ -38,25 +38,26 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
 function placeholderShips(): PlacedShip[] {
   return [
     { id: 1, name: "Portaavions", size: 5, cells: [], hits: [], found: false },
-    { id: 2, name: "Cuirassat",   size: 4, cells: [], hits: [], found: false },
-    { id: 3, name: "Destructor",  size: 3, cells: [], hits: [], found: false },
-    { id: 4, name: "Submarí",     size: 3, cells: [], hits: [], found: false },
-    { id: 5, name: "Patrullera",  size: 2, cells: [], hits: [], found: false },
+    { id: 2, name: "Cuirassat", size: 4, cells: [], hits: [], found: false },
+    { id: 3, name: "Destructor", size: 3, cells: [], hits: [], found: false },
+    { id: 4, name: "Submarí", size: 3, cells: [], hits: [], found: false },
+    { id: 5, name: "Patrullera", size: 2, cells: [], hits: [], found: false },
   ];
 }
 
 export default function GamePage() {
-  const [ships, setShips]           = useState<PlacedShip[]>(placeholderShips());
-  const [board, setBoard]           = useState<Record<string, CellState>>({});
-  const [log, setLog]               = useState<LogEntry[]>([]);
+  const [ships, setShips] = useState<PlacedShip[]>(placeholderShips());
+  const [board, setBoard] = useState<Record<string, CellState>>({});
+  const [log, setLog] = useState<LogEntry[]>([]);
   const [shotsTaken, setShotsTaken] = useState(0);
-  const [maxShots, setMaxShots]     = useState(MAX_ATTEMPTS);
-  const [msg, setMsg]               = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
-  const [seconds, setSeconds]       = useState(0);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState<string | null>(null);
-  const [won, setWon]               = useState(false);
+  const [maxShots, setMaxShots] = useState(MAX_ATTEMPTS);
+  const [msg, setMsg] = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
+  const [seconds, setSeconds] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [won, setWon] = useState(false);
   const nextId = useRef(100);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -161,18 +162,17 @@ export default function GamePage() {
     setLoading(true);
     try {
       await gameApi.abandon();
-      await newGame();
+      navigate("/");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error abandonant");
-    } finally {
       setLoading(false);
     }
   }
 
   // Toast styles matching GameConfig pill / card aesthetic
   const msgCls: Record<string, string> = {
-    miss:  "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
-    hit:   "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
+    miss: "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
+    hit: "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
     found: "border-sky-400/45 bg-sky-400/10 text-sky-300 shadow-[0_0_18px_rgba(56,189,248,.18)]",
   };
 
@@ -182,7 +182,7 @@ export default function GamePage() {
 
 
 
-     
+
 
         {/* Toast */}
         {msg && (
