@@ -35,16 +35,10 @@ export default function Login() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6">
 
-            {/* Logo */}
-            <div className="fade-in-2 logo-float mb-8 relative">
-                <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-2xl scale-150" />
-                <Logo />
-            </div>
-
             {/* Card */}
-            <div className="fade-in-3 w-full max-w-md rounded-2xl border border-sky-500/20 bg-sky-500/5 backdrop-blur-sm p-8">
+            <div className="card p-8">
 
-                <h2 className="font-cinzel-deco text-white text-2xl text-center mb-8 tracking-wider">
+                <h2 className="title-1">
                     Iniciar Sessió
                 </h2>
 
@@ -52,7 +46,7 @@ export default function Login() {
 
                     {/* Email */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Correu electrònic
                         </label>
                         <input
@@ -67,7 +61,7 @@ export default function Login() {
 
                     {/* Password */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Contrasenya
                         </label>
                         <input
@@ -99,7 +93,7 @@ export default function Login() {
                 </form>
 
                 {/* Register link */}
-                <div className="flex items-center gap-4 mt-8">
+                <div className="flex items-center gap-4">
                     <div className="h-px flex-1 bg-linear-to-r from-transparent to-sky-400/30" />
                     <Link
                         to="/register"

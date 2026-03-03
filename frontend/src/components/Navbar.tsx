@@ -14,7 +14,7 @@ export default function Navbar() {
     }
 
     return (
-        <nav className="relative z-20 flex items-center justify-between px-6 py-4 border-b border-sky-500/10">
+        <nav className="relative z-20 flex items-center justify-between px-6 pt-5">
 
             {/* Logo text */}
             <Link
@@ -50,14 +50,14 @@ export default function Navbar() {
                     <>
                         <Link
                             to="/login"
-                            className="font-cinzel text-sky-400/60 text-xs uppercase tracking-widest hover:text-sky-300/80 transition-colors duration-200"
+                            className="font-cinzel text-sky-400/70 text-xs uppercase tracking-widest hover:text-sky-300/80 transition-colors duration-200"
                         >
-                            Entrar
+                            Login
                         </Link>
                         <div className="h-4 w-px bg-sky-500/20" />
                         <Link
                             to="/register"
-                            className="font-cinzel text-xs uppercase tracking-widest px-4 py-1.5 rounded-full border border-sky-500/25 bg-sky-500/5 text-sky-300/70 hover:border-sky-400/50 hover:text-sky-200/80 transition-all duration-200"
+                            className="pill"
                         >
                             Registrar-se
                         </Link>
