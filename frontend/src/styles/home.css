@@ -8,16 +8,6 @@
             font-family: 'Cinzel Decorative', serif;
         }
 
-        @keyframes gridDrift {
-            0% {
-                transform: translateY(0);
-            }
-
-            100% {
-                transform: translateY(60px);
-            }
-        }
-
         @keyframes sonarScan {
             0% {
                 top: -2px;
@@ -101,7 +91,6 @@
                 linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
             background-size: 60px 60px;
-            animation: gridDrift 20s linear infinite;
         }
 
         .sonar-line {
