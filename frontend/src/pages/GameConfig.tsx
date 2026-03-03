@@ -1,7 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Game from "./Game"
-import Logo from "../components/Logo"
+import type { GameConfig } from "../api";
 
 const DEFAULT_SHIPS = [
     { id: 1, size: 2 },
@@ -25,18 +24,13 @@ export default function GameConfig() {
     const [salvoMode, setSalvoMode] = useState(false);
 
     const handleStartGame = () => {
-        navigate("/game", {
-            state: { boardSize, ships, timeLimit, salvoMode }
-        });
-    };
-
-    const updateShip = (id: string, field: "size" | "count", delta: number) => {
-        setShips(prev => prev.map(s => {
-            if (s.id !== id) return s;
-            if (field === "size") return { ...s, size: Math.max(1, Math.min(boardSize - 1, s.size + delta)) };
-            if (field === "count") return { ...s, count: Math.max(0, Math.min(5, s.count + delta)) };
-            return s;
-        }));
+        const config: GameConfig = {
+            board_size: boardSize,
+            ships: ships.map(s => ({ size: s.size })),
+            time_limit: timeLimit === 0 ? null : timeLimit,
+            salvo_mode: salvoMode,
+        };
+        navigate("/game", { state: config });
     };
 
     return (
@@ -59,11 +53,7 @@ export default function GameConfig() {
                             <button
                                 key={s}
                                 onClick={() => setBoardSize(s)}
-                                className={`
-                  ${boardSize === s
-                                        ? "active-pill"
-                                        : "pill"
-                                    }`}
+                                className={`${boardSize === s ? "active-pill" : "pill"}`}
                             >
                                 {s}×{s}
                             </button>
@@ -105,11 +95,7 @@ export default function GameConfig() {
                                     {Array.from({ length: 5 }).map((_, j) => (
                                         <div
                                             key={j}
-                                            className={`
-                                ${j < ship.size - 1
-                                                    ? "config-bar"
-                                                    : "config-bar-active"
-                                                }`}
+                                            className={`${j < ship.size - 1 ? "config-bar" : "config-bar-active"}`}
                                         />
                                     ))}
                                 </div>
@@ -144,11 +130,7 @@ export default function GameConfig() {
                             <button
                                 key={opt.value}
                                 onClick={() => setTimeLimit(opt.value)}
-                                className={`
-                  ${timeLimit === opt.value
-                                        ? "active-pill"
-                                        : "pill"
-                                    }`}
+                                className={`${timeLimit === opt.value ? "active-pill" : "pill"}`}
                             >
                                 {opt.label}
                             </button>
@@ -184,7 +166,7 @@ export default function GameConfig() {
                 </div>
             </div>
 
-            <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-8 gap-4">
+            <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-4 gap-4">
                 <div className="flex gap-2 flex-wrap justify-center">
                     {[
                         `${boardSize}×${boardSize}`,
@@ -203,5 +185,5 @@ export default function GameConfig() {
                 </button>
             </div>
         </div>
-    )
+    );
 }

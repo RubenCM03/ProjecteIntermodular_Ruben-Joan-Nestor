@@ -118,6 +118,13 @@ export interface RankingEntry {
   avg_attempts: number;
 }
 
+export interface GameConfig {
+  board_size?: number;
+  ships?: { size: number }[];
+  time_limit?: number | null;
+  salvo_mode?: boolean;
+}
+
 // ─── Auth ─────────────────────────────────────────────────
 export const authApi = {
   register: (name: string, email: string, password: string) =>
@@ -134,7 +141,8 @@ export const authApi = {
 // ─── Game ─────────────────────────────────────────────────
 export const gameApi = {
   /** POST /game — crea o retorna la partida activa */
-  create: () => post<ApiCreateResponse>("/game"),
+  create: (config?: GameConfig) =>
+    post<ApiCreateResponse>("/game", config ?? {}),
 
   /** GET /game — estat de la partida activa */
   show: () => get<ApiShowResponse>("/game"),
