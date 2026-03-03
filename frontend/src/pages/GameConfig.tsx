@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-
+import Game from "./Game"
 import Logo from "../components/Logo"
 
 const DEFAULT_SHIPS = [
@@ -18,10 +18,17 @@ const TIME_OPTIONS = [
 ];
 
 export default function GameConfig() {
+    const navigate = useNavigate();
     const [boardSize, setBoardSize] = useState(10);
     const [ships, setShips] = useState(DEFAULT_SHIPS);
     const [timeLimit, setTimeLimit] = useState(0);
     const [salvoMode, setSalvoMode] = useState(false);
+
+    const handleStartGame = () => {
+    navigate("/game", {
+        state: { boardSize, ships, timeLimit, salvoMode }
+    });
+};
 
     const updateShip = (id: string, field: "size" | "count", delta: number) => {
         setShips(prev => prev.map(s => {
@@ -104,7 +111,7 @@ export default function GameConfig() {
                                         <div
                                             key={j}
                                             className={`h-[11px] flex-1 rounded-[3px] border transition-all
-                                ${j < ship.size - 1  // -1 porque mínimo es 2
+                                ${j < ship.size - 1
                                                     ? "bg-sky-400/42 border-sky-400/65 shadow-[0_0_4px_rgba(56,189,248,.35)]"
                                                     : "bg-sky-400/8 border-sky-400/25"
                                                 }`}
@@ -197,7 +204,7 @@ export default function GameConfig() {
                     ))}
                 </div>
 
-                <button className="btn">
+                <button onClick={handleStartGame} className="btn">
                     Iniciar partida
                 </button>
             </div>
