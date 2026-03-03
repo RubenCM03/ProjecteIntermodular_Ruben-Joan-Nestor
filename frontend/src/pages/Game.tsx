@@ -1,14 +1,14 @@
 import '../styles/home.css';
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Link, useLocation } from "react-router-dom";
 import type { CellState, PlacedShip, LogEntry } from "../types";
 import { MAX_ATTEMPTS } from "../types";
 import FleetPanel from "../components/Game/FleetPanel";
 import BoardPanel from "../components/Game/BoardPanel";
 import SidePanel from "../components/Game/SidePanel";
 import { gameApi, rowColToCoord } from "../api";
-import type { ApiGame, ShotResponse } from "../api";
-import { Link, useNavigate } from "react-router-dom";
+import type { ApiGame, ShotResponse, GameConfig } from "../api";
 import Logo from "../components/Logo";
 
 function buildBoard(shots: ApiGame["shots"]): Record<string, CellState> {
@@ -29,8 +29,8 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
       s.result === "sunk"
         ? `${coord} → Enfonsat ✓`
         : s.result === "hit"
-          ? `${coord} → Encert`
-          : `${coord} → Aigua`;
+        ? `${coord} → Encert`
+        : `${coord} → Aigua`;
     return { id: i + 1, type, text };
   });
 }
@@ -38,26 +38,38 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
 function placeholderShips(): PlacedShip[] {
   return [
     { id: 1, name: "Portaavions", size: 5, cells: [], hits: [], found: false },
-    { id: 2, name: "Cuirassat", size: 4, cells: [], hits: [], found: false },
-    { id: 3, name: "Destructor", size: 3, cells: [], hits: [], found: false },
-    { id: 4, name: "Submarí", size: 3, cells: [], hits: [], found: false },
-    { id: 5, name: "Patrullera", size: 2, cells: [], hits: [], found: false },
+    { id: 2, name: "Cuirassat",   size: 4, cells: [], hits: [], found: false },
+    { id: 3, name: "Destructor",  size: 3, cells: [], hits: [], found: false },
+    { id: 4, name: "Submarí",     size: 3, cells: [], hits: [], found: false },
+    { id: 5, name: "Patrullera",  size: 2, cells: [], hits: [], found: false },
   ];
 }
 
 export default function GamePage() {
-  const [ships, setShips] = useState<PlacedShip[]>(placeholderShips());
-  const [board, setBoard] = useState<Record<string, CellState>>({});
-  const [log, setLog] = useState<LogEntry[]>([]);
-  const [shotsTaken, setShotsTaken] = useState(0);
-  const [maxShots, setMaxShots] = useState(MAX_ATTEMPTS);
-  const [msg, setMsg] = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
-  const [seconds, setSeconds] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [won, setWon] = useState(false);
+  const { state } = useLocation();
+
+  const gameConfig: GameConfig | undefined = state && state.boardSize
+    ? {
+        board_size: state.boardSize,
+        ships:      state.ships.map((s: { size: number }) => ({ size: s.size })),
+        time_limit: state.timeLimit,
+        salvo_mode: state.salvoMode,
+      }
+    : undefined;
+
+  const [ships, setShips]               = useState<PlacedShip[]>(placeholderShips());
+  const [board, setBoard]               = useState<Record<string, CellState>>({});
+  const [log, setLog]                   = useState<LogEntry[]>([]);
+  const [shotsTaken, setShotsTaken]     = useState(0);
+  const [maxShots, setMaxShots]         = useState(MAX_ATTEMPTS);
+  const [msg, setMsg]                   = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
+  const [seconds, setSeconds]           = useState(0);
+  const [loading, setLoading]           = useState(false);
+  const [shooting, setShooting]         = useState(false);
+  const [error, setError]               = useState<string | null>(null);
+  const [won, setWon]                   = useState(false);
+  const [lastSunkShip, setLastSunkShip] = useState<PlacedShip | null>(null);
   const nextId = useRef(100);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -77,7 +89,7 @@ export default function GamePage() {
         const res = await gameApi.show();
         apiGame = res.game;
       } catch {
-        const res = await gameApi.create();
+        const res = await gameApi.create(gameConfig);
         apiGame = res.game;
       }
       applyApiGame(apiGame);
@@ -109,23 +121,24 @@ export default function GamePage() {
   }
 
   async function handleCell(coord: string) {
-    if (board[coord] || shotsTaken >= maxShots || loading || won) return;
-    setLoading(true);
+    if (board[coord] || shotsTaken >= maxShots || shooting || won) return;
+    setShooting(true);
     try {
       const res: ShotResponse = await gameApi.shoot(coord);
-      setShotsTaken(res.game.shots_taken);
-      setWon(res.won);
+
+      setShotsTaken(res.shots_taken);
+      if (res.won) setWon(true);
 
       if (res.result === "sunk") {
         setBoard((b) => ({ ...b, [coord]: "found" }));
-        const shipName = res.ship ?? "Vaixell";
-        showMsg(`${shipName} ENFONSAT! 🎉`, "found");
-        addLog("found", `${coord} → ${shipName} ✓`);
-        setShips((prev) =>
-          prev.map((s) =>
-            s.name === shipName ? { ...s, found: true, hits: [...s.hits, coord] } : s
-          )
-        );
+        setShips((prev) => {
+          const idx = prev.findIndex((s) => !s.found);
+          if (idx === -1) return prev;
+          const updated = prev.map((s, i) => i === idx ? { ...s, found: true } : s);
+          setLastSunkShip(updated[idx]);
+          return updated;
+        });
+        addLog("found", `${coord} → Enfonsat ✓`);
       } else if (res.result === "hit") {
         setBoard((b) => ({ ...b, [coord]: "hit" }));
         showMsg(`${coord} — ENCERT! 🎯`, "hit");
@@ -139,7 +152,7 @@ export default function GamePage() {
       setError(e instanceof Error ? e.message : "Error al disparar");
       setTimeout(() => setError(null), 3000);
     } finally {
-      setLoading(false);
+      setShooting(false);
     }
   }
 
@@ -147,8 +160,9 @@ export default function GamePage() {
     setLoading(true);
     setError(null);
     setWon(false);
+    setLastSunkShip(null);
     try {
-      const res = await gameApi.create();
+      const res = await gameApi.create(gameConfig);
       applyApiGame(res.game);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error creant partida");
@@ -162,40 +176,33 @@ export default function GamePage() {
     setLoading(true);
     try {
       await gameApi.abandon();
-      navigate("/");
+      await newGame();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error abandonant");
+    } finally {
       setLoading(false);
     }
   }
 
-  // Toast styles matching GameConfig pill / card aesthetic
   const msgCls: Record<string, string> = {
-    miss: "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
-    hit: "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
+    miss:  "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
+    hit:   "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
     found: "border-sky-400/45 bg-sky-400/10 text-sky-300 shadow-[0_0_18px_rgba(56,189,248,.18)]",
   };
 
   return (
     <>
       <div className="">
-
-
-
-
-
         {/* Toast */}
         {msg && (
-          <div
-            className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border font-[Cinzel] text-[.65rem] tracking-[.2em] uppercase fade-up ${msgCls[msg.kind]}`}
-          >
+          <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border font-[Cinzel] text-[.65rem] tracking-[.2em] uppercase fade-up ${msgCls[msg.kind]}`}>
             {msg.text}
           </div>
         )}
 
         {/* Error */}
         {error && (
-          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border border-red-400/40  -red-400/8 text-red-300 font-[Cinzel] text-[.65rem] tracking-[.2em] fade-up">
+          <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border border-red-400/40 bg-red-400/8 text-red-300 font-[Cinzel] text-[.65rem] tracking-[.2em] fade-up">
             {error}
           </div>
         )}
@@ -211,17 +218,15 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* Win overlay — matches GameConfig card style */}
+        {/* Win overlay */}
         {won && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
             <div className="bg-[rgba(3,15,30,0.95)] border border-sky-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(56,189,248,.1)] max-w-sm w-full mx-4">
-              {/* Decoration */}
               <div className="flex items-center gap-4">
                 <div className="h-px w-12 bg-linear-to-r from-transparent to-sky-400/30" />
                 <span className="text-sky-400/50 text-base">⚓</span>
                 <div className="h-px w-12 bg-linear-to-l from-transparent to-sky-400/30" />
               </div>
-
               <div className="text-center">
                 <h2
                   className="font-[Cinzel_Decorative] text-2xl text-sky-300 tracking-wider"
@@ -233,18 +238,12 @@ export default function GamePage() {
                   Victòria
                 </p>
               </div>
-
               <div className="h-px w-full bg-linear-to-r from-transparent via-sky-400/15 to-transparent" />
-
               <div className="flex gap-3">
                 <span className="active-pill cursor-auto">{shotsTaken} intents</span>
                 <span className="active-pill cursor-auto">{timerStr}</span>
               </div>
-
-              <button onClick={newGame} className="btn">
-                Nova partida
-              </button>
-
+              <button onClick={newGame} className="btn">Nova partida</button>
               <Link
                 to="/"
                 className="font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase text-sky-400/40 hover:text-sky-400/70 transition-colors"
@@ -256,9 +255,12 @@ export default function GamePage() {
         )}
 
         {/* 3 panels */}
-        <div className="relative z-10 flex flex-1 min-h-0 overflow-hidden">
+        <div className="relative z-10 flex min-h-screen">
           <FleetPanel ships={ships} board={board} />
-          <BoardPanel board={board} onCell={handleCell} />
+          <BoardPanel
+            board={board}
+            onCell={handleCell}
+          />
           <SidePanel timerStr={timerStr} log={log} onAbandon={handleAbandon} />
         </div>
       </div>
