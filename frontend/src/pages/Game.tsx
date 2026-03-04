@@ -29,8 +29,8 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
       s.result === "sunk"
         ? `${coord} → Salvat ✓`
         : s.result === "hit"
-        ? `${coord} → Encert`
-        : `${coord} → Aigua`;
+          ? `${coord} → Encert`
+          : `${coord} → Aigua`;
     return { id: i + 1, type, text };
   });
 }
@@ -55,46 +55,45 @@ function placeholderShips(ships?: { size: number }[]): PlacedShip[] {
   }
   return [
     { id: 1, name: "Portaavions", size: 5, cells: [], hits: [], found: false },
-    { id: 2, name: "Cuirassat",   size: 4, cells: [], hits: [], found: false },
-    { id: 3, name: "Destructor",  size: 3, cells: [], hits: [], found: false },
-    { id: 4, name: "Submarí",     size: 3, cells: [], hits: [], found: false },
-    { id: 5, name: "Patrullera",  size: 2, cells: [], hits: [], found: false },
+    { id: 2, name: "Cuirassat", size: 4, cells: [], hits: [], found: false },
+    { id: 3, name: "Destructor", size: 3, cells: [], hits: [], found: false },
+    { id: 4, name: "Submarí", size: 3, cells: [], hits: [], found: false },
+    { id: 5, name: "Patrullera", size: 2, cells: [], hits: [], found: false },
   ];
 }
 
 export default function GamePage() {
   const { state } = useLocation();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
 
   const boardSize: number = state?.boardSize ?? 10;
   const timeLimit: number = state?.timeLimit ?? 0;
 
   const gameConfig = state?.boardSize
     ? {
-        board_size: state.boardSize,
-        ships:      state.ships.map((s: { size: number }) => ({ size: s.size })),
-        time_limit: state.timeLimit,
-        salvo_mode: state.salvoMode,
-      }
+      board_size: state.boardSize,
+      ships: state.ships.map((s: { size: number }) => ({ size: s.size })),
+      time_limit: state.timeLimit,
+    }
     : undefined;
 
-  const [ships, setShips]               = useState<PlacedShip[]>(placeholderShips(gameConfig?.ships));
-  const [board, setBoard]               = useState<Record<string, CellState>>({});
-  const [log, setLog]                   = useState<LogEntry[]>([]);
-  const [shotsTaken, setShotsTaken]     = useState(0);
-  const [maxShots, setMaxShots]         = useState(MAX_ATTEMPTS);
-  const [msg, setMsg]                   = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
-  const [seconds, setSeconds]           = useState(0);
-  const [loading, setLoading]           = useState(false);
-  const [shooting, setShooting]         = useState(false);
-  const [error, setError]               = useState<string | null>(null);
-  const [won, setWon]                   = useState(false);
-  const [lost, setLost]                 = useState(false);
-  const [lostReason, setLostReason]     = useState<"time" | "shots">("time");
+  const [ships, setShips] = useState<PlacedShip[]>(placeholderShips(gameConfig?.ships));
+  const [board, setBoard] = useState<Record<string, CellState>>({});
+  const [log, setLog] = useState<LogEntry[]>([]);
+  const [shotsTaken, setShotsTaken] = useState(0);
+  const [maxShots, setMaxShots] = useState(MAX_ATTEMPTS);
+  const [msg, setMsg] = useState<{ text: string; kind: "miss" | "hit" | "found" } | null>(null);
+  const [seconds, setSeconds] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [shooting, setShooting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [won, setWon] = useState(false);
+  const [lost, setLost] = useState(false);
+  const [lostReason, setLostReason] = useState<"time" | "shots">("time");
   const [lastSunkShip, setLastSunkShip] = useState<PlacedShip | null>(null);
-  const [turnSeconds, setTurnSeconds]   = useState(0);
+  const [turnSeconds, setTurnSeconds] = useState(0);
 
-  const nextId       = useRef(100);
+  const nextId = useRef(100);
   const turnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Global timer — stops when game ends
@@ -265,8 +264,8 @@ export default function GamePage() {
   }
 
   const msgCls: Record<string, string> = {
-    miss:  "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
-    hit:   "border-yellow-400/40 bg-yellow-400/8 text-yellow-300 shadow-[0_0_18px_rgba(250,204,21,.15)]",
+    miss: "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
+    hit: "border-yellow-400/40 bg-yellow-400/8 text-yellow-300 shadow-[0_0_18px_rgba(250,204,21,.15)]",
     found: "border-green-400/45 bg-green-400/10 text-green-300 shadow-[0_0_18px_rgba(74,222,128,.18)]",
   };
 

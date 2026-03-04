@@ -143,7 +143,7 @@ export const authApi = {
 export const gameApi = {
   /** POST /game — crea o retorna la partida activa */
 
-  create: () => post<ApiCreateResponse>("/game"),
+  create: (config?: GameConfig) => post<ApiCreateResponse>("/game", config),
 
   /** GET /game — estat de la partida activa */
   show: () => get<ApiShowResponse>("/game"),
