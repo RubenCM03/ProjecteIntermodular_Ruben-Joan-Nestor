@@ -88,9 +88,10 @@ export interface ApiShowResponse {
 // Shot endpoint response (from ShotController)
 export interface ShotResponse {
   result: "hit" | "miss" | "sunk";
-  ship?: string; // ship name when sunk
-  won: boolean;
-  game: ApiGame;
+  ship?: string;
+  won?: boolean;
+  shots_taken: number;
+  shots_left: number;
 }
 
 export interface Stats {
@@ -141,8 +142,8 @@ export const authApi = {
 // ─── Game ─────────────────────────────────────────────────
 export const gameApi = {
   /** POST /game — crea o retorna la partida activa */
-  create: (config?: GameConfig) =>
-    post<ApiCreateResponse>("/game", config ?? {}),
+
+  create: () => post<ApiCreateResponse>("/game"),
 
   /** GET /game — estat de la partida activa */
   show: () => get<ApiShowResponse>("/game"),
