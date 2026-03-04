@@ -9,7 +9,6 @@ import BoardPanel from "../components/Game/BoardPanel";
 import SidePanel from "../components/Game/SidePanel";
 import { gameApi, rowColToCoord } from "../api";
 import type { ApiGame, ShotResponse } from "../api";
-import Logo from "../components/Logo";
 
 function buildBoard(shots: ApiGame["shots"]): Record<string, CellState> {
   const board: Record<string, CellState> = {};
@@ -96,7 +95,6 @@ export default function GamePage() {
   const nextId = useRef(100);
   const turnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Global timer — stops when game ends
   useEffect(() => {
     if (won || lost) return;
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -105,7 +103,6 @@ export default function GamePage() {
 
   const timerStr = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
-  // ── Turn timer ──────────────────────────────────────────
   function startTurnTimer() {
     if (turnTimerRef.current) clearInterval(turnTimerRef.current);
     setTurnSeconds(0);
@@ -121,7 +118,6 @@ export default function GamePage() {
     turnTimerRef.current = null;
   }
 
-  // Detect turn time expiry → lose
   useEffect(() => {
     if (timeLimit > 0 && turnSeconds >= timeLimit && !won && !lost && turnTimerRef.current) {
       stopTurnTimer();
@@ -130,7 +126,6 @@ export default function GamePage() {
     }
   }, [turnSeconds, timeLimit, won, lost]);
 
-  // Cleanup on unmount
   useEffect(() => () => stopTurnTimer(), []);
 
   useEffect(() => { loadGame(); }, []);
@@ -213,7 +208,6 @@ export default function GamePage() {
         addLog("miss", `${coord} → Aigua`);
       }
 
-      // Check shots exhausted
       if (!res.won && newShotsTaken >= maxShots) {
         stopTurnTimer();
         setLostReason("shots");
@@ -221,7 +215,6 @@ export default function GamePage() {
         return;
       }
 
-      // Only restart turn timer if game continues
       if (!res.won) {
         startTurnTimer();
       }
@@ -272,21 +265,18 @@ export default function GamePage() {
   return (
     <>
       <div className="">
-        {/* Toast */}
         {msg && (
           <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border font-[Cinzel] text-[.65rem] tracking-[.2em] uppercase fade-up ${msgCls[msg.kind]}`}>
             {msg.text}
           </div>
         )}
 
-        {/* Error */}
         {error && (
           <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 rounded-xl border border-red-400/40 bg-red-400/8 text-red-300 font-[Cinzel] text-[.65rem] tracking-[.2em] fade-up">
             {error}
           </div>
         )}
 
-        {/* Loading overlay */}
         {loading && (
           <div className="fixed inset-0 z-40 bg-[rgba(3,15,30,.45)] backdrop-blur-sm flex items-center justify-center pointer-events-none">
             <div className="bg-[rgba(3,15,30,0.85)] border border-sky-400/15 rounded-2xl px-8 py-4">
@@ -297,7 +287,6 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* Victory overlay */}
         {won && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
             <div className="bg-[rgba(3,15,30,0.95)] border border-green-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(74,222,128,.1)] max-w-sm w-full mx-4">
@@ -326,7 +315,6 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* Loss overlay */}
         {lost && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
             <div className="bg-[rgba(3,15,30,0.95)] border border-red-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(248,56,56,.1)] max-w-sm w-full mx-4">
@@ -355,7 +343,6 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* 3 panels */}
         <div className="relative z-10 flex min-h-screen">
           <FleetPanel ships={ships} board={board} />
           <BoardPanel

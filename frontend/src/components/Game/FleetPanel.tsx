@@ -60,9 +60,9 @@ function ShipRow({ ship }: { ship: PlacedShip }) {
                 width: 7,
                 height: 7,
                 background: ship.found
-                ? "rgba(74,222,128,.65)"       // verde
+                ? "rgba(74,222,128,.65)"       // verd
                 : i < ship.hits.length
-                ? "#facc15"                    // amarillo
+                ? "#facc15"                    // groc
                 : "rgba(56,189,248,.12)",
               borderColor: ship.found
                 ? "rgba(74,222,128,.8)"
