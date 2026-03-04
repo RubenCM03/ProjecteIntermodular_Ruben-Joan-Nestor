@@ -121,7 +121,7 @@ export interface RankingEntry {
 export interface GameConfig {
   board_size?: number;
   ships?: { size: number }[];
-  time_limit?: number | null;
+  play_limit?: number | null;
   salvo_mode?: boolean;
 }
 

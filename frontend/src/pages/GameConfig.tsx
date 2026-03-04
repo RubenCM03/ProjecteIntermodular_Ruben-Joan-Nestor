@@ -9,26 +9,24 @@ const DEFAULT_SHIPS = [
     { id: 4, size: 5 },
 ];
 
-const TIME_OPTIONS = [
+const PLAY_OPTIONS = [
     { label: "Sense límit", value: 0 },
-    { label: "30 seg", value: 30 },
-    { label: "1 min", value: 60 },
-    { label: "2 min", value: 120 },
+    { label: "35", value: 35 },
+    { label: "50", value: 50 },
+    { label: "100", value: 100 },
 ];
 
 export default function GameConfig() {
     const navigate = useNavigate();
     const [boardSize, setBoardSize] = useState(10);
     const [ships, setShips] = useState(DEFAULT_SHIPS);
-    const [timeLimit, setTimeLimit] = useState(0);
-    const [salvoMode, setSalvoMode] = useState(false);
+    const [playLimit, setPlayLimit] = useState(0);
 
     const handleStartGame = () => {
         const config: GameConfig = {
             board_size: boardSize,
             ships: ships.map(s => ({ size: s.size })),
-            time_limit: timeLimit === 0 ? null : timeLimit,
-            salvo_mode: salvoMode,
+            play_limit: playLimit === 0 ? null : playLimit,
         };
         navigate("/game", { state: config });
     };
@@ -124,13 +122,13 @@ export default function GameConfig() {
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
                 <div>
-                    <p className="form-title">Temps límit per torn</p>
+                    <p className="form-title">Intents límit</p>
                     <div className="flex gap-2 flex-wrap">
-                        {TIME_OPTIONS.map(opt => (
+                        {PLAY_OPTIONS.map(opt => (
                             <button
                                 key={opt.value}
-                                onClick={() => setTimeLimit(opt.value)}
-                                className={`${timeLimit === opt.value ? "active-pill" : "pill"}`}
+                                onClick={() => setPlayLimit(opt.value)}
+                                className={`${playLimit === opt.value ? "active-pill" : "pill"}`}
                             >
                                 {opt.label}
                             </button>
@@ -147,8 +145,7 @@ export default function GameConfig() {
                     {[
                         `${boardSize}×${boardSize}`,
                         `${ships.length} vaixells`,
-                        ...(timeLimit > 0 ? [`${timeLimit}s / torn`] : []),
-                        ...(salvoMode ? [`Mode Salva`] : []),
+                        ...(playLimit > 0 ? [`${playLimit} intents`] : []),
                     ].map(label => (
                         <span key={label} className="active-pill cursor-auto">
                             {label}
