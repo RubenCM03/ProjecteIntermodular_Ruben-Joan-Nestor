@@ -14,7 +14,7 @@ class GameController extends Controller
     private array $defaultShipConfig = [
         ['name' => 'Portaavions', 'size' => 5],
         ['name' => 'Cuirassat',   'size' => 4],
-        ['name' => 'Destructor',  'size' => 3],
+        ['name' => 'Creuer',  'size' => 3],
         ['name' => 'Submarí',     'size' => 3],
         ['name' => 'Patrullera',  'size' => 2],
     ];
