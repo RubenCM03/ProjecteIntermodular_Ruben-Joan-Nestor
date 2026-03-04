@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer components {
+    .btn {
+        @apply font-[Cinzel_Decorative] font-bold text-[.95rem] tracking-[.15em] uppercase px-11 py-3 rounded-full border border-sky-400/45 bg-linear-to-b from-[rgba(14,116,144,.45)] to-[rgba(7,70,100,.65)] text-sky-50 cursor-pointer transition-all duration-300 relative overflow-hidden hover:border-sky-400/75 before:absolute before:inset-0 before:bg-linear-to-b before:from-white/7 before:to-transparent before:rounded-full before:pointer-events-none;
+    }
+
+    .card {
+        @apply animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 bg-[rgba(3,15,30,0.65)] border border-sky-400/10 rounded-2xl backdrop-blur-xl max-w-lg w-full mx-auto p-6 flex flex-col gap-6
+    }
+    
+    .small-btn {
+        @apply w-[26px] h-[26px] rounded-md border border-sky-400/22 bg-sky-400/5 text-sky-300 text-[15px] flex items-center justify-center cursor-pointer transition-all hover:bg-sky-400/14 hover:border-sky-400/45 disabled:opacity-30 disabled:cursor-not-allowed 
+    }
+
+    .pill {
+        @apply font-[Cinzel] text-xs tracking-widest px-4 py-1.5 rounded-full border transition-all duration-200 cursor-pointer border-sky-400/18 bg-sky-400/4 text-sky-300/55 hover:border-sky-400/32 hover:text-sky-300
+    }
+
+    .active-pill {
+        @apply font-[Cinzel] text-xs tracking-widest px-4 py-1.5 rounded-full border transition-all duration-200 cursor-pointer border-sky-400/60 bg-sky-400/16 text-sky-50 shadow-[0_0_12px_rgba(56,189,248,.2)]
+    }
+
+    .config-bar {
+        @apply h-[11px] flex-1 rounded-[3px] border transition-all bg-sky-400/42 border-sky-400/65 shadow-[0_0_4px_rgba(56,189,248,.35)]
+    }
+
+    .config-bar-active {
+        @apply h-[11px] flex-1 rounded-[3px] border transition-all bg-sky-400/8 border-sky-400/25
+    }
+
+    .form-title {
+        @apply font-[Cinzel] text-sky-300/70 text-xs uppercase tracking-widest mb-2
+    }
+
+    .title-1{
+        @apply font-[Cinzel] font-bold text-white text-3xl text-center tracking-wider
+    }
+}

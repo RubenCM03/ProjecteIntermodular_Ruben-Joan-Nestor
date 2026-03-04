@@ -24,7 +24,6 @@ class GameController extends Controller
         $request->validate([
             'board_size'          => 'integer|min:8|max:15',
             'ships'               => 'array|min:1|max:10',
-            'ships.*.name'        => 'required_with:ships|string|max:50',
             'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
             'time_limit'          => 'nullable|integer|min:60|max:3600',
         ]);
@@ -42,16 +41,11 @@ class GameController extends Controller
         }
 
         $boardSize  = $request->input('board_size', 10);
-        $shipConfig = $request->input('ships', $this->defaultShipConfig);
-
-        // Validar que els vaixells caben al tauler
-        foreach ($shipConfig as $ship) {
-            if ($ship['size'] >= $boardSize) {
-                return response()->json([
-                    'message' => "El vaixell {$ship['name']} (mida {$ship['size']}) no cap en un tauler de {$boardSize}x{$boardSize}"
-                ], 422);
-            }
-        }
+        $shipConfig = collect($request->input('ships', $this->defaultShipConfig))
+            ->map(fn($ship, $index) => [
+                'name' => $this->defaultShipConfig[$index]['name'] ?? 'Vaixell ' . ($index + 1),
+                'size' => $ship['size'],
+            ])->toArray();
 
         $game = Game::create([
             'user_id'     => $request->user()->id,
@@ -86,23 +80,23 @@ class GameController extends Controller
             ->where('status', GameStatus::PLAYING)
             ->with('shots')
             ->first();
-    
+
         if (!$game) {
             return response()->json([
                 'message' => 'No tens cap partida en curs'
             ], 404);
         }
-    
+
         // Comprovar si s'ha acabat el temps
         if ($game->time_limit !== null) {
             $elapsed = (int) $game->started_at->diffInSeconds(now());
-        
+
             if ($elapsed >= $game->time_limit) {
                 $game->update([
                     'status'      => GameStatus::LOST,
                     'finished_at' => now(),
                 ]);
-            
+
                 return response()->json([
                     'message'   => 'La partida ha expirat per temps',
                     'game_over' => true,
@@ -110,7 +104,7 @@ class GameController extends Controller
                 ], 200);
             }
         }
-    
+
         return response()->json([
             'game' => $this->formatGame($game),
         ]);
@@ -213,22 +207,21 @@ class GameController extends Controller
     private function formatGame(Game $game): array
     {
         $game->load('shots');
-
         $timeInfo = $this->getTimeInfo($game);
 
         return [
-            'id'          => $game->id,
-            'status'      => $game->status->value,
-            'board_size'  => $game->board_size,
-            'shots_taken' => $game->shots_taken,
-            'max_shots'   => $game->max_shots,
-            'shots_left'  => $game->max_shots - $game->shots_taken,
-            'time_limit'  => $game->time_limit,
-            'time_elapsed' => $timeInfo['elapsed'],
-            'time_left'   => $timeInfo['left'],
-            'started_at'  => $game->started_at,
-            'finished_at' => $game->finished_at,
-            'shots'       => $game->shots->map(fn($s) => [
+            'id'                => $game->id,
+            'status'            => $game->status->value,
+            'board_size'        => $game->board_size,
+            'shots_taken'       => $game->shots_taken,
+            'max_shots'         => $game->max_shots,
+            'shots_left'        => $game->max_shots - $game->shots_taken,
+            'time_limit'        => $game->time_limit,
+            'time_elapsed'      => $timeInfo['elapsed'],
+            'time_left'         => $timeInfo['left'],
+            'started_at'        => $game->started_at,
+            'finished_at'       => $game->finished_at,
+            'shots'             => $game->shots->map(fn($s) => [
                 'row'    => $s->row,
                 'col'    => $s->col,
                 'result' => $s->result->value,
