@@ -26,7 +26,6 @@ class GameController extends Controller
             'ships'               => 'array|min:1|max:10',
             'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
             'time_limit'          => 'nullable|integer|min:60|max:3600',
-            'salvo_mode'          => 'boolean',
         ]);
 
         // Si el jugador ja té una partida en curs, la retornem
@@ -56,8 +55,6 @@ class GameController extends Controller
             'board_size'  => $boardSize,
             'ship_config' => $shipConfig,
             'time_limit'  => $request->input('time_limit'),
-            'salvo_mode'         => $request->input('salvo_mode', false),
-            'salvo_turn_active'  => false,
             'started_at'  => now(),
         ]);
 
@@ -222,8 +219,6 @@ class GameController extends Controller
             'time_limit'        => $game->time_limit,
             'time_elapsed'      => $timeInfo['elapsed'],
             'time_left'         => $timeInfo['left'],
-            'salvo_mode'        => $game->salvo_mode,         // 👈
-            'salvo_turn_active' => $game->salvo_turn_active,  // 👈
             'started_at'        => $game->started_at,
             'finished_at'       => $game->finished_at,
             'shots'             => $game->shots->map(fn($s) => [
