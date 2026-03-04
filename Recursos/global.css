@@ -102,35 +102,7 @@
             animation: sonarScan 5s ease-in-out infinite;
         }
 
-        .bubble {
-            animation: rise linear infinite;
-            border-radius: 50%;
-        }
 
         .logo-float {
             animation: float 4s ease-in-out infinite;
-        }
-
-        .fade-in-1 {
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 0.1s;
-            opacity: 0;
-        }
-
-        .fade-in-2 {
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 0.4s;
-            opacity: 0;
-        }
-
-        .fade-in-3 {
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 0.7s;
-            opacity: 0;
-        }
-
-        .fade-in-4 {
-            animation: fadeInUp 0.8s ease forwards;
-            animation-delay: 1.0s;
-            opacity: 0;
         }
