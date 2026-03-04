@@ -16,29 +16,24 @@ export default function Navbar() {
     return (
         <nav className="relative z-20 flex items-center justify-between px-6 pt-5">
 
-            {/* Logo text */}
             <Link
                 to="/"
-                className="font-cinzel-deco text-sky-300/80 text-sm tracking-widest uppercase hover:text-sky-200 transition-colors duration-200"
+                className="form-title hover:scale-110 transition-all hover:text-white"
             >
                 Trobar la Flota
             </Link>
 
-            {/* Right side */}
             <div className="flex items-center gap-4">
                 {loading ? (
                     <div className="w-20 h-4 rounded-full bg-sky-500/10 animate-pulse" />
                 ) : user ? (
                     <>
-                        {/* Username */}
                         <span className="font-cinzel text-sky-300/50 text-xs uppercase tracking-widest hidden sm:block">
                             {user.name}
                         </span>
 
-                        {/* Divider */}
                         <div className="h-4 w-px bg-sky-500/20" />
 
-                        {/* Logout */}
                         <button
                             onClick={handleLogout}
                             className="font-cinzel text-sky-400/60 text-xs uppercase tracking-widest hover:text-red-400/70 transition-colors duration-200 cursor-pointer"

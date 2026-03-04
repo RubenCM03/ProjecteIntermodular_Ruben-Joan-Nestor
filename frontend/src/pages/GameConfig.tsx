@@ -95,7 +95,7 @@ export default function GameConfig() {
                                     {Array.from({ length: 5 }).map((_, j) => (
                                         <div
                                             key={j}
-                                            className={`${j < ship.size - 1 ? "config-bar" : "config-bar-active"}`}
+                                            className={`${j < ship.size ? "config-bar" : "config-bar-active"}`}
                                         />
                                     ))}
                                 </div>
@@ -140,30 +140,6 @@ export default function GameConfig() {
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
-                <div className="flex items-start gap-4 justify-between">
-                    <div className="flex-1">
-                        <p className="form-title">Mode Salva</p>
-                        <p className="font-[Cinzel] text-sky-300/45 text-xs leading-relaxed">
-                            Si el jugador enfonsa un vaixell, continua disparant fins que toca aigua.
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => setSalvoMode(v => !v)}
-                        aria-label="Activar mode salva"
-                        className={`relative mt-1 w-[50px] h-[26px] rounded-full border flex-shrink-0 cursor-pointer transition-all duration-300
-              ${salvoMode
-                                ? "bg-sky-400/30 border-sky-400/55"
-                                : "bg-sky-400/10 border-sky-400/20"
-                            }`}
-                    >
-                        <span className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300
-              ${salvoMode
-                                ? "translate-x-6 bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,.7)]"
-                                : "bg-sky-400/45"
-                            }`}
-                        />
-                    </button>
-                </div>
             </div>
 
             <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-4 gap-4">

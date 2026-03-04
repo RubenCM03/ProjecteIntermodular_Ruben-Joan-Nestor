@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import { register, saveToken } from '../services/authService'
 import type { ApiError } from '../services/authService'
-import '../styles/home.css'
 import { useAuth } from '../context/AuthContext'
+import '../styles/home.css'
 
 export default function Register() {
     const navigate = useNavigate()
@@ -40,25 +40,16 @@ export default function Register() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 py-10">
+            <div className="card">
 
-            {/* Logo */}
-            <div className="fade-in-2 logo-float mb-8 relative">
-                <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-2xl scale-150" />
-                <Logo />
-            </div>
-
-            {/* Card */}
-            <div className="fade-in-3 w-full max-w-md rounded-2xl border border-sky-500/20 bg-sky-500/5 backdrop-blur-sm p-8">
-
-                <h2 className="font-cinzel-deco text-white text-2xl text-center mb-8 tracking-wider">
+                <h2 className="title-1">
                     Crear Compte
                 </h2>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-                    {/* Nom */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Nom
                         </label>
                         <input
@@ -72,9 +63,8 @@ export default function Register() {
                         {fieldError('name') && <span className="font-cinzel text-red-400/80 text-xs">{fieldError('name')}</span>}
                     </div>
 
-                    {/* Email */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Correu electrònic
                         </label>
                         <input
@@ -88,9 +78,8 @@ export default function Register() {
                         {fieldError('email') && <span className="font-cinzel text-red-400/80 text-xs">{fieldError('email')}</span>}
                     </div>
 
-                    {/* Password */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Contrasenya
                         </label>
                         <input
@@ -104,9 +93,8 @@ export default function Register() {
                         {fieldError('password') && <span className="font-cinzel text-red-400/80 text-xs">{fieldError('password')}</span>}
                     </div>
 
-                    {/* Confirmar password */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="font-cinzel text-sky-300/70 text-xs uppercase tracking-widest">
+                        <label className="form-title">
                             Confirmar Contrasenya
                         </label>
                         <input
@@ -119,25 +107,22 @@ export default function Register() {
                         />
                     </div>
 
-                    {/* Error general */}
                     {fieldError('general') && (
                         <div className="font-cinzel text-red-400/80 text-xs text-center border border-red-500/20 bg-red-500/5 rounded-lg px-4 py-3">
                             {fieldError('general')}
                         </div>
                     )}
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={loading}
-                        className="mt-2 font-cinzel-deco text-white font-bold text-sm px-12 py-4 rounded-full border border-sky-400/50 bg-linear-to-b from-sky-600/40 to-sky-900/60 backdrop-blur-sm hover:from-sky-500/60 hover:to-sky-800/70 hover:border-sky-300/70 transition-all duration-300 tracking-wider uppercase disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="btn"
                     >
                         {loading ? 'Registrant...' : 'Registrar-se'}
                     </button>
 
                 </form>
 
-                {/* Login link */}
                 <div className="flex items-center gap-4 mt-8">
                     <div className="h-px flex-1 bg-linear-to-r from-transparent to-sky-400/30" />
                     <Link

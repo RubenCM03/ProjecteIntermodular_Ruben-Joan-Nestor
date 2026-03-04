@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Logo from '../components/Logo'
 import { login, saveToken } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 import type { ApiError } from '../services/authService'
 import '../styles/home.css'
-import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
     const navigate = useNavigate()
@@ -35,7 +34,6 @@ export default function Login() {
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6">
 
-            {/* Card */}
             <div className="card p-8">
 
                 <h2 className="title-1">
@@ -44,7 +42,6 @@ export default function Login() {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-                    {/* Email */}
                     <div className="flex flex-col gap-1.5">
                         <label className="form-title">
                             Correu electrònic
@@ -59,7 +56,6 @@ export default function Login() {
                         />
                     </div>
 
-                    {/* Password */}
                     <div className="flex flex-col gap-1.5">
                         <label className="form-title">
                             Contrasenya
@@ -74,14 +70,12 @@ export default function Login() {
                         />
                     </div>
 
-                    {/* Error */}
                     {error && (
                         <div className="font-cinzel text-red-400/80 text-xs text-center border border-red-500/20 bg-red-500/5 rounded-lg px-4 py-3">
                             {error}
                         </div>
                     )}
 
-                    {/* Submit */}
                     <button
                         type="submit"
                         disabled={loading}
@@ -92,7 +86,6 @@ export default function Login() {
 
                 </form>
 
-                {/* Register link */}
                 <div className="flex items-center gap-4">
                     <div className="h-px flex-1 bg-linear-to-r from-transparent to-sky-400/30" />
                     <Link
