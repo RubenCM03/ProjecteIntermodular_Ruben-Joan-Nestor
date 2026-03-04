@@ -98,21 +98,6 @@ class ShotController extends Controller
         $game->increment('shots_taken');
         $game->refresh();
 
-        // Lògica SALVO
-        if ($game->salvo_mode) {
-            if ($result === ShotResult::MISS) {
-                // Ha fallat, acaba el torn SALVO
-                $game->update(['salvo_turn_active' => false]);
-                $salvoMessage = 'Has fallat, torn acabat';
-            } else {
-                // Ha tocat o enfonsat, el torn SALVO segueix actiu
-                $game->update(['salvo_turn_active' => true]);
-                $salvoMessage = $result === ShotResult::SUNK
-                    ? 'Vaixell enfonsat! Pots seguir disparant'
-                    : 'Tocat! Pots seguir disparant';
-            }
-        }
-
         // Comprovar fi de partida
         $gameOver = $this->checkGameOver($game, $result);
 
@@ -121,11 +106,6 @@ class ShotController extends Controller
             'shots_taken' => $game->shots_taken,
             'shots_left'  => $game->max_shots - $game->shots_taken,
         ];
-
-        if ($game->salvo_mode) {
-            $response['salvo_turn_active'] = $game->salvo_turn_active;
-            $response['salvo_message']     = $salvoMessage ?? null;
-        }
 
         if ($result === ShotResult::SUNK) {
             $response['sunk_ship'] = $hitShip->name;
