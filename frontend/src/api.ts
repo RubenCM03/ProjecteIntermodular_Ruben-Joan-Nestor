@@ -111,11 +111,15 @@ export interface HistoryEntry {
 }
 
 export interface RankingEntry {
-  rank: number;
-  name: string;
-  wins: number;
-  best_game: number;
-  avg_attempts: number;
+    name: string;
+    total_games: number;
+    won_games: number;
+    win_rate: string;
+    best_score: number;
+}
+
+export interface RankingResponse {
+    ranking: RankingEntry[];
 }
 
 export interface GameConfig {
@@ -163,11 +167,11 @@ export const gameApi = {
 
 // ─── Stats ────────────────────────────────────────────────
 export const statsApi = {
-  myStats: () => get<Stats>("/stats"),
-  myHistory: () => get<HistoryEntry[]>("/history"),
-  ranking: () => get<RankingEntry[]>("/ranking"),
-  globalStats: () => get<Stats>("/admin/stats"),
-};
+  myStats: () => get<{ stats: Stats }>("/stats"),
+  myHistory: () => get<{ history: HistoryEntry[] }>("/history"),
+  ranking: () => get<RankingResponse>("/ranking"),
+  globalStats: () => get<{ global_stats: Stats }>("/admin/stats"),
+}
 
 // ─── Token helpers ────────────────────────────────────────
 export function saveToken(token: string) {

@@ -6,10 +6,12 @@ import { MAX_ATTEMPTS } from "../types";
 import FleetPanel from "../components/Game/FleetPanel";
 import BoardPanel from "../components/Game/BoardPanel";
 import SidePanel from "../components/Game/SidePanel";
+import VictoryOverlay from '../components/Game/VictoryOverlay'
 import { gameApi, rowColToCoord } from "../api";
 import type { ApiGame, ShotResponse } from "../api";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
+
 
 function buildBoard(shots: ApiGame["shots"]): Record<string, CellState> {
   const board: Record<string, CellState> = {};
@@ -213,46 +215,12 @@ export default function GamePage() {
 
         {/* Win overlay — matches GameConfig card style */}
         {won && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
-            <div className="bg-[rgba(3,15,30,0.95)] border border-sky-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(56,189,248,.1)] max-w-sm w-full mx-4">
-              {/* Decoration */}
-              <div className="flex items-center gap-4">
-                <div className="h-px w-12 bg-linear-to-r from-transparent to-sky-400/30" />
-                <span className="text-sky-400/50 text-base">⚓</span>
-                <div className="h-px w-12 bg-linear-to-l from-transparent to-sky-400/30" />
-              </div>
-
-              <div className="text-center">
-                <h2
-                  className="font-[Cinzel_Decorative] text-2xl text-sky-300 tracking-wider"
-                  style={{ textShadow: "0 0 30px rgba(56,189,248,.35)" }}
-                >
-                  Flota Trobada!
-                </h2>
-                <p className="font-[Cinzel] text-sky-400/50 text-xs tracking-[.2em] uppercase mt-2">
-                  Victòria
-                </p>
-              </div>
-
-              <div className="h-px w-full bg-linear-to-r from-transparent via-sky-400/15 to-transparent" />
-
-              <div className="flex gap-3">
-                <span className="active-pill cursor-auto">{shotsTaken} intents</span>
-                <span className="active-pill cursor-auto">{timerStr}</span>
-              </div>
-
-              <button onClick={newGame} className="btn">
-                Nova partida
-              </button>
-
-              <Link
-                to="/"
-                className="font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase text-sky-400/40 hover:text-sky-400/70 transition-colors"
-              >
-                Menú principal
-              </Link>
-            </div>
-          </div>
+            <VictoryOverlay
+                shotsUsed={shotsTaken}
+                timeStr={timerStr}
+                onClose={() => setWon(false)}
+                onPlayAgain={newGame}
+            />
         )}
 
         {/* 3 panels */}
