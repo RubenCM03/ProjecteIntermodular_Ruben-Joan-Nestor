@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { COLS, ROWS } from "../../types";
 import type { CellState, PlacedShip } from "../../types";
 
 interface Props {
@@ -7,8 +6,8 @@ interface Props {
   onCell: (coord: string) => void;
   lastSunkShip: PlacedShip | null;
   onCloseSunk: () => void;
+  boardSize: number; 
 }
-
 const SHIP_SVG: Record<string, string> = {
   "Portaavions": "/carrier_dark.svg",
   "Cuirassat":   "/battleship_dark.svg",
@@ -21,11 +20,11 @@ function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }
   const [ripple, setRipple] = useState(false);
 
   const cls: Record<CellState, string> = {
-    empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
-    miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
-    hit:   "bg-red-500/10 border-red-400/40 cursor-default",
-    found: "bg-sky-400/15 border-sky-400/50 cursor-default",
-  };
+  empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
+  miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
+  hit:   "bg-yellow-400/15 border-yellow-400/50 cursor-default",   // amarillo
+  found: "bg-green-400/15 border-green-400/50 cursor-default",     // verde
+};
 
   function click() {
     if (state !== "empty") return;
@@ -42,8 +41,8 @@ function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }
     >
       {ripple && <div className="cell-ripple" />}
       {state === "miss" && <span className="text-sky-400/40 text-xl leading-none">·</span>}
-      {state === "hit" && <span style={{ color: "#ff6b35", fontSize: 13, textShadow: "0 0 8px #ff6b35" }}>✕</span>}
-      {state === "found" && <span className="text-sky-400 text-xs" style={{ textShadow: "0 0 10px rgba(56,189,248,.8)" }}>◆</span>}
+      {state === "hit"   && <span style={{ color: "#facc15", fontSize: 13, textShadow: "0 0 8px #facc15" }}>✕</span>}
+      {state === "found" && <span className="text-green-400 text-xs" style={{ textShadow: "0 0 10px rgba(74,222,128,.8)" }}>◆</span>}
     </div>
   );
 }
@@ -81,7 +80,7 @@ function SunkShipPopup({ ship, onClose }: { ship: PlacedShip; onClose: () => voi
             {ship.name}
           </p>
           <p className="font-[Cinzel] text-sky-400/50 text-[.6rem] tracking-[.25em] uppercase mt-1">
-            Enfonsat!
+            Salvat!
           </p>
         </div>
 
@@ -98,7 +97,11 @@ function SunkShipPopup({ ship, onClose }: { ship: PlacedShip; onClose: () => voi
   );
 }
 
-export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk }: Props) {
+export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, boardSize }: Props) {
+  const cols = Array.from({ length: boardSize }, (_, i) =>
+    String.fromCharCode(65 + i) // A, B, C...
+  );
+  const rows = Array.from({ length: boardSize }, (_, i) => i + 1);
   return (
     <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
       <div className="scanline" />
@@ -119,7 +122,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk }:
           )}
 
           <div className="flex ml-[27px] mb-1.5">
-            {COLS.map((c) => (
+            {cols.map((c) => (
               <div key={c} className="font-[Cinzel] text-[10px] text-sky-400/40 text-center" style={{ width: 40 }}>
                 {c}
               </div>
@@ -127,7 +130,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk }:
           </div>
 
           <div className="flex flex-col gap-0.5">
-            {ROWS.map((r) => (
+            {rows.map((r) => (
               <div key={r} className="flex items-center gap-0.5">
                 <div
                   className="font-[Cinzel] text-[10px] text-sky-400/40 text-right pr-1.5 flex-shrink-0"
@@ -135,7 +138,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk }:
                 >
                   {r}
                 </div>
-                {COLS.map((c) => {
+                {cols.map((c) => {
                   const coord = `${c}${r}`;
                   return (
                     <BoardCell

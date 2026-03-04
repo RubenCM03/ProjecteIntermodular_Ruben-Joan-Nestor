@@ -60,31 +60,29 @@ function ShipRow({ ship }: { ship: PlacedShip }) {
                 width: 7,
                 height: 7,
                 background: ship.found
-                  ? "rgba(56,189,248,.65)"
-                  : i < ship.hits.length
-                  ? "#ff6b35"
-                  : "rgba(56,189,248,.12)",
-                borderColor: ship.found
-                  ? "rgba(56,189,248,.8)"
-                  : i < ship.hits.length
-                  ? "rgba(255,107,53,.6)"
-                  : "rgba(56,189,248,.2)",
-                boxShadow: ship.found
-                  ? "0 0 4px rgba(56,189,248,.4)"
-                  : i < ship.hits.length
-                  ? "0 0 3px rgba(255,107,53,.5)"
-                  : "none",
+                ? "rgba(74,222,128,.65)"       // verde
+                : i < ship.hits.length
+                ? "#facc15"                    // amarillo
+                : "rgba(56,189,248,.12)",
+              borderColor: ship.found
+                ? "rgba(74,222,128,.8)"
+                : i < ship.hits.length
+                ? "rgba(250,204,21,.6)"
+                : "rgba(56,189,248,.2)",
+              boxShadow: ship.found
+                ? "0 0 4px rgba(74,222,128,.4)"
+                : i < ship.hits.length
+                ? "0 0 3px rgba(250,204,21,.5)"
+                : "none",
               }}
             />
           ))}
         </div>
       </div>
 
-      <span
-        className={`font-[Cinzel] text-[.6rem] flex-shrink-0 ${
-          ship.found ? "text-sky-400" : ship.hits.length > 0 ? "text-orange-400" : "text-sky-400/30"
-        }`}
-      >
+      <span className={`font-[Cinzel] text-[.6rem] flex-shrink-0 ${
+          ship.found ? "text-green-400" : ship.hits.length > 0 ? "text-yellow-400" : "text-sky-400/30"
+        }`}>
         {ship.found ? "✓" : ship.hits.length > 0 ? `${ship.hits.length}/${ship.size}` : "···"}
       </span>
     </div>

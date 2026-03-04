@@ -116,26 +116,28 @@ export default function SidePanel({ timerStr, log, onAbandon }: Props) {
               <div
                 key={e.id}
                 className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border font-[Cinzel] text-[.6rem] tracking-[.05em] fade-up transition-all flex-shrink-0 ${
-                  e.type === "found"
-                    ? "border-sky-400/25 bg-sky-400/8 text-sky-300"
-                    : e.type === "hit"
-                    ? "border-orange-400/20 bg-orange-400/5 text-orange-300"
-                    : "border-sky-400/8 bg-transparent text-sky-400/40"
-                }`}
+                e.type === "found"
+                  ? "border-green-400/25 bg-green-400/8 text-green-300"
+                  : e.type === "hit"
+                  ? "border-yellow-400/20 bg-yellow-400/5 text-yellow-300"
+                  : "border-sky-400/8 bg-transparent text-sky-400/40"
+              }`}
               >
                 <div
                   className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                    e.type === "found"
-                      ? "bg-sky-400"
-                      : e.type === "hit"
-                      ? "bg-orange-400"
-                      : "bg-sky-400/30"
-                  }`}
-                  style={
-                    e.type === "found"
-                      ? { boxShadow: "0 0 6px rgba(56,189,248,.6)" }
-                      : {}
-                  }
+                  e.type === "found"
+                    ? "bg-green-400"
+                    : e.type === "hit"
+                    ? "bg-yellow-400"
+                    : "bg-sky-400/30"
+                }`}
+                style={
+                  e.type === "found"
+                    ? { boxShadow: "0 0 6px rgba(74,222,128,.6)" }
+                    : e.type === "hit"
+                    ? { boxShadow: "0 0 6px rgba(250,204,21,.6)" }
+                    : {}
+                }
                 />
                 {e.text}
               </div>

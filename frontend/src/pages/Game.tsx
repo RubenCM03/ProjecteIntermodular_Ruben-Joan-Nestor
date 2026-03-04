@@ -27,15 +27,31 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
       s.result === "sunk" ? "found" : s.result === "hit" ? "hit" : "miss";
     const text =
       s.result === "sunk"
-        ? `${coord} → Enfonsat ✓`
-        : s.result === "hit"
-        ? `${coord} → Encert`
-        : `${coord} → Aigua`;
+      ? `${coord} → Salvat ✓`
+      : s.result === "hit"
+      ? `${coord} → Encert`
+      : `${coord} → Aigua`;
     return { id: i + 1, type, text };
   });
 }
-
-function placeholderShips(): PlacedShip[] {
+const SHIP_BY_SIZE: Record<number, string> = {
+  5: "Portaavions",
+  4: "Cuirassat",
+  3: "Destructor",
+  2: "Patrullera",
+};
+function placeholderShips(ships?: { size: number }[]): PlacedShip[] {
+  if (ships && ships.length > 0) {
+    return ships.map((s, i) => ({
+      id: i + 1,
+      name: SHIP_BY_SIZE[s.size] ?? `Vaixell ${i + 1}`,
+      size: s.size,
+      cells: [],
+      hits: [],
+      found: false,
+    }));
+  }
+  // fallback por defecto
   return [
     { id: 1, name: "Portaavions", size: 5, cells: [], hits: [], found: false },
     { id: 2, name: "Cuirassat",   size: 4, cells: [], hits: [], found: false },
@@ -57,7 +73,9 @@ export default function GamePage() {
       }
     : undefined;
 
-  const [ships, setShips]               = useState<PlacedShip[]>(placeholderShips());
+  const [ships, setShips] = useState<PlacedShip[]>(
+    placeholderShips(gameConfig?.ships)
+  );
   const [board, setBoard]               = useState<Record<string, CellState>>({});
   const [log, setLog]                   = useState<LogEntry[]>([]);
   const [shotsTaken, setShotsTaken]     = useState(0);
@@ -69,6 +87,8 @@ export default function GamePage() {
   const [error, setError]               = useState<string | null>(null);
   const [won, setWon]                   = useState(false);
   const [lastSunkShip, setLastSunkShip] = useState<PlacedShip | null>(null);
+    const boardSize: number = state?.boardSize ?? 10;
+
   const nextId = useRef(100);
 
   useEffect(() => {
@@ -101,14 +121,14 @@ export default function GamePage() {
   }
 
   function applyApiGame(apiGame: ApiGame) {
-    setBoard(buildBoard(apiGame.shots));
-    setLog(buildLog(apiGame.shots));
-    setShotsTaken(apiGame.shots_taken);
-    setMaxShots(apiGame.max_shots);
-    setWon(apiGame.status === "won");
-    setSeconds(0);
-    setShips(placeholderShips());
-  }
+  setBoard(buildBoard(apiGame.shots));
+  setLog(buildLog(apiGame.shots));
+  setShotsTaken(apiGame.shots_taken);
+  setMaxShots(apiGame.max_shots);
+  setWon(apiGame.status === "won");
+  setSeconds(0);
+  setShips(placeholderShips(gameConfig?.ships)); // <-- pasa la config
+}
 
   const showMsg = useCallback((text: string, kind: "miss" | "hit" | "found") => {
     setMsg({ text, kind });
@@ -138,10 +158,10 @@ export default function GamePage() {
           setLastSunkShip(updated[idx]);
           return updated;
         });
-        addLog("found", `${coord} → Enfonsat ✓`);
+        addLog("found", `${coord} → Salvat ✓`);
       } else if (res.result === "hit") {
         setBoard((b) => ({ ...b, [coord]: "hit" }));
-        showMsg(`${coord} — ENCERT! 🎯`, "hit");
+        showMsg(`${coord} — ENCERT! `, "hit");
         addLog("hit", `${coord} → Encert`);
       } else {
         setBoard((b) => ({ ...b, [coord]: "miss" }));
@@ -183,7 +203,7 @@ export default function GamePage() {
       setLoading(false);
     }
   }
-
+  
   const msgCls: Record<string, string> = {
     miss:  "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
     hit:   "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
@@ -257,10 +277,13 @@ export default function GamePage() {
         {/* 3 panels */}
         <div className="relative z-10 flex min-h-screen">
           <FleetPanel ships={ships} board={board} />
-          <BoardPanel
-            board={board}
-            onCell={handleCell}
-          />
+                      <BoardPanel
+              board={board}
+              onCell={handleCell}
+              lastSunkShip={lastSunkShip}
+              onCloseSunk={() => setLastSunkShip(null)}
+              boardSize={boardSize}   // <-- nuevo
+            />
           <SidePanel timerStr={timerStr} log={log} onAbandon={handleAbandon} />
         </div>
       </div>
