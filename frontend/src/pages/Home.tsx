@@ -1,8 +1,11 @@
 import '../styles/home.css'
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo"
+import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
+    const { user } = useAuth()
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 text-center">
 
@@ -11,7 +14,6 @@ export default function Home() {
                 <div className="absolute inset-0 rounded-full bg-sky-400/10 blur-2xl scale-150" />
                 <Logo />
             </div>
-
 
             {/* Tagline */}
             <p className="fade-in-3 font-cinzel text-sky-300/70 text-sm md:text-base uppercase mb-3">
@@ -33,11 +35,11 @@ export default function Home() {
             {/* CTA Button */}
             <div className="fade-in-4">
                 <Link
-                    to="/game-config"
+                    to={user ? "/game-config" : "/register"}
                     className="btn"
                 >
                     <span className="items-center gap-3">
-                        Jugar ara!
+                        {user ? 'Jugar ara!' : 'Jugar ara!'}
                     </span>
                 </Link>
             </div>
