@@ -6,25 +6,25 @@ interface Props {
   onCell: (coord: string) => void;
   lastSunkShip: PlacedShip | null;
   onCloseSunk: () => void;
-  boardSize: number; 
+  boardSize: number;
 }
 const SHIP_SVG: Record<string, string> = {
   "Portaavions": "/carrier_dark.svg",
-  "Cuirassat":   "/battleship_dark.svg",
-  "Destructor":  "/destroyer_dark.svg",
-  "Submarí":     "/submarine_dark.svg",
-  "Patrullera":  "/cruiser_dark.svg",
+  "Cuirassat": "/battleship_dark.svg",
+  "Destructor": "/destroyer_dark.svg",
+  "Submarí": "/submarine_dark.svg",
+  "Patrullera": "/cruiser_dark.svg",
 };
 
 function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }) {
   const [ripple, setRipple] = useState(false);
 
   const cls: Record<CellState, string> = {
-  empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
-  miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
-  hit:   "bg-yellow-400/15 border-yellow-400/50 cursor-default",   // amarillo
-  found: "bg-green-400/15 border-green-400/50 cursor-default",     // verde
-};
+    empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
+    miss: "bg-sky-900/20 border-sky-400/15 cursor-default",
+    hit: "bg-yellow-400/15 border-yellow-400/50 cursor-default",   // amarillo
+    found: "bg-green-400/15 border-green-400/50 cursor-default",     // verde
+  };
 
   function click() {
     if (state !== "empty") return;
@@ -41,7 +41,7 @@ function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }
     >
       {ripple && <div className="cell-ripple" />}
       {state === "miss" && <span className="text-sky-400/40 text-xl leading-none">·</span>}
-      {state === "hit"   && <span style={{ color: "#facc15", fontSize: 13, textShadow: "0 0 8px #facc15" }}>✕</span>}
+      {state === "hit" && <span style={{ color: "#facc15", fontSize: 13, textShadow: "0 0 8px #facc15" }}>✕</span>}
       {state === "found" && <span className="text-green-400 text-xs" style={{ textShadow: "0 0 10px rgba(74,222,128,.8)" }}>◆</span>}
     </div>
   );
@@ -115,7 +115,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
           <div className="h-px w-12 bg-linear-to-l from-transparent to-sky-400/30" />
         </div>
 
-        <div className="bg-[rgba(3,15,30,0.65)] border border-sky-400/10 rounded-2xl backdrop-blur-xl p-5 relative">
+        <div className="card gap-0">
           {/* Popup barco hundido */}
           {lastSunkShip && (
             <SunkShipPopup ship={lastSunkShip} onClose={onCloseSunk} />
