@@ -1,14 +1,14 @@
 import '../styles/home.css';
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { CellState, PlacedShip, LogEntry } from "../types";
 import { MAX_ATTEMPTS } from "../types";
 import FleetPanel from "../components/Game/FleetPanel";
 import BoardPanel from "../components/Game/BoardPanel";
 import SidePanel from "../components/Game/SidePanel";
 import { gameApi, rowColToCoord } from "../api";
-import type { ApiGame, ShotResponse, GameConfig } from "../api";
+import type { ApiGame, ShotResponse } from "../api";
 import Logo from "../components/Logo";
 
 function buildBoard(shots: ApiGame["shots"]): Record<string, CellState> {
@@ -27,19 +27,21 @@ function buildLog(shots: ApiGame["shots"]): LogEntry[] {
       s.result === "sunk" ? "found" : s.result === "hit" ? "hit" : "miss";
     const text =
       s.result === "sunk"
-      ? `${coord} → Salvat ✓`
-      : s.result === "hit"
-      ? `${coord} → Encert`
-      : `${coord} → Aigua`;
+        ? `${coord} → Salvat ✓`
+        : s.result === "hit"
+        ? `${coord} → Encert`
+        : `${coord} → Aigua`;
     return { id: i + 1, type, text };
   });
 }
+
 const SHIP_BY_SIZE: Record<number, string> = {
   5: "Portaavions",
   4: "Cuirassat",
   3: "Destructor",
   2: "Patrullera",
 };
+
 function placeholderShips(ships?: { size: number }[]): PlacedShip[] {
   if (ships && ships.length > 0) {
     return ships.map((s, i) => ({
@@ -51,7 +53,6 @@ function placeholderShips(ships?: { size: number }[]): PlacedShip[] {
       found: false,
     }));
   }
-  // fallback por defecto
   return [
     { id: 1, name: "Portaavions", size: 5, cells: [], hits: [], found: false },
     { id: 2, name: "Cuirassat",   size: 4, cells: [], hits: [], found: false },
@@ -63,8 +64,12 @@ function placeholderShips(ships?: { size: number }[]): PlacedShip[] {
 
 export default function GamePage() {
   const { state } = useLocation();
+  const navigate  = useNavigate();
 
-  const gameConfig: GameConfig | undefined = state && state.boardSize
+  const boardSize: number = state?.boardSize ?? 10;
+  const timeLimit: number = state?.timeLimit ?? 0;
+
+  const gameConfig = state?.boardSize
     ? {
         board_size: state.boardSize,
         ships:      state.ships.map((s: { size: number }) => ({ size: s.size })),
@@ -73,9 +78,7 @@ export default function GamePage() {
       }
     : undefined;
 
-  const [ships, setShips] = useState<PlacedShip[]>(
-    placeholderShips(gameConfig?.ships)
-  );
+  const [ships, setShips]               = useState<PlacedShip[]>(placeholderShips(gameConfig?.ships));
   const [board, setBoard]               = useState<Record<string, CellState>>({});
   const [log, setLog]                   = useState<LogEntry[]>([]);
   const [shotsTaken, setShotsTaken]     = useState(0);
@@ -86,17 +89,50 @@ export default function GamePage() {
   const [shooting, setShooting]         = useState(false);
   const [error, setError]               = useState<string | null>(null);
   const [won, setWon]                   = useState(false);
+  const [lost, setLost]                 = useState(false);
+  const [lostReason, setLostReason]     = useState<"time" | "shots">("time");
   const [lastSunkShip, setLastSunkShip] = useState<PlacedShip | null>(null);
-    const boardSize: number = state?.boardSize ?? 10;
+  const [turnSeconds, setTurnSeconds]   = useState(0);
 
-  const nextId = useRef(100);
+  const nextId       = useRef(100);
+  const turnTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Global timer — stops when game ends
   useEffect(() => {
+    if (won || lost) return;
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(t);
-  }, []);
+  }, [won, lost]);
 
   const timerStr = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+
+  // ── Turn timer ──────────────────────────────────────────
+  function startTurnTimer() {
+    if (turnTimerRef.current) clearInterval(turnTimerRef.current);
+    setTurnSeconds(0);
+    if (timeLimit > 0) {
+      turnTimerRef.current = setInterval(() => {
+        setTurnSeconds((s) => s + 1);
+      }, 1000);
+    }
+  }
+
+  function stopTurnTimer() {
+    if (turnTimerRef.current) clearInterval(turnTimerRef.current);
+    turnTimerRef.current = null;
+  }
+
+  // Detect turn time expiry → lose
+  useEffect(() => {
+    if (timeLimit > 0 && turnSeconds >= timeLimit && !won && !lost && turnTimerRef.current) {
+      stopTurnTimer();
+      setLostReason("time");
+      setLost(true);
+    }
+  }, [turnSeconds, timeLimit, won, lost]);
+
+  // Cleanup on unmount
+  useEffect(() => () => stopTurnTimer(), []);
 
   useEffect(() => { loadGame(); }, []);
 
@@ -121,14 +157,17 @@ export default function GamePage() {
   }
 
   function applyApiGame(apiGame: ApiGame) {
-  setBoard(buildBoard(apiGame.shots));
-  setLog(buildLog(apiGame.shots));
-  setShotsTaken(apiGame.shots_taken);
-  setMaxShots(apiGame.max_shots);
-  setWon(apiGame.status === "won");
-  setSeconds(0);
-  setShips(placeholderShips(gameConfig?.ships)); // <-- pasa la config
-}
+    setBoard(buildBoard(apiGame.shots));
+    setLog(buildLog(apiGame.shots));
+    setShotsTaken(apiGame.shots_taken);
+    setMaxShots(apiGame.max_shots);
+    setWon(apiGame.status === "won");
+    setLost(apiGame.status === "lost");
+    setSeconds(0);
+    setTurnSeconds(0);
+    stopTurnTimer();
+    setShips(placeholderShips(gameConfig?.ships));
+  }
 
   const showMsg = useCallback((text: string, kind: "miss" | "hit" | "found") => {
     setMsg({ text, kind });
@@ -141,13 +180,18 @@ export default function GamePage() {
   }
 
   async function handleCell(coord: string) {
-    if (board[coord] || shotsTaken >= maxShots || shooting || won) return;
+    if (board[coord] || shotsTaken >= maxShots || shooting || won || lost) return;
     setShooting(true);
     try {
       const res: ShotResponse = await gameApi.shoot(coord);
 
-      setShotsTaken(res.shots_taken);
-      if (res.won) setWon(true);
+      const newShotsTaken = res.shots_taken;
+      setShotsTaken(newShotsTaken);
+
+      if (res.won) {
+        setWon(true);
+        stopTurnTimer();
+      }
 
       if (res.result === "sunk") {
         setBoard((b) => ({ ...b, [coord]: "found" }));
@@ -158,16 +202,31 @@ export default function GamePage() {
           setLastSunkShip(updated[idx]);
           return updated;
         });
+        showMsg(`${coord} — SALVAT! ⚓`, "found");
         addLog("found", `${coord} → Salvat ✓`);
       } else if (res.result === "hit") {
         setBoard((b) => ({ ...b, [coord]: "hit" }));
-        showMsg(`${coord} — ENCERT! `, "hit");
+        showMsg(`${coord} — ENCERT! 🎯`, "hit");
         addLog("hit", `${coord} → Encert`);
       } else {
         setBoard((b) => ({ ...b, [coord]: "miss" }));
         showMsg(`${coord} — Aigua…`, "miss");
         addLog("miss", `${coord} → Aigua`);
       }
+
+      // Check shots exhausted
+      if (!res.won && newShotsTaken >= maxShots) {
+        stopTurnTimer();
+        setLostReason("shots");
+        setLost(true);
+        return;
+      }
+
+      // Only restart turn timer if game continues
+      if (!res.won) {
+        startTurnTimer();
+      }
+
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al disparar");
       setTimeout(() => setError(null), 3000);
@@ -179,8 +238,8 @@ export default function GamePage() {
   async function newGame() {
     setLoading(true);
     setError(null);
-    setWon(false);
     setLastSunkShip(null);
+    stopTurnTimer();
     try {
       const res = await gameApi.create(gameConfig);
       applyApiGame(res.game);
@@ -194,20 +253,21 @@ export default function GamePage() {
   async function handleAbandon() {
     if (!window.confirm("Abandonar la partida?")) return;
     setLoading(true);
+    stopTurnTimer();
     try {
       await gameApi.abandon();
-      await newGame();
+      navigate("/");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error abandonant");
     } finally {
       setLoading(false);
     }
   }
-  
+
   const msgCls: Record<string, string> = {
     miss:  "border-sky-400/15 bg-[rgba(3,15,30,0.92)] text-sky-400/50",
-    hit:   "border-orange-400/40 bg-orange-400/8 text-orange-300 shadow-[0_0_18px_rgba(255,107,53,.15)]",
-    found: "border-sky-400/45 bg-sky-400/10 text-sky-300 shadow-[0_0_18px_rgba(56,189,248,.18)]",
+    hit:   "border-yellow-400/40 bg-yellow-400/8 text-yellow-300 shadow-[0_0_18px_rgba(250,204,21,.15)]",
+    found: "border-green-400/45 bg-green-400/10 text-green-300 shadow-[0_0_18px_rgba(74,222,128,.18)]",
   };
 
   return (
@@ -238,36 +298,58 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* Win overlay */}
+        {/* Victory overlay */}
         {won && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
-            <div className="bg-[rgba(3,15,30,0.95)] border border-sky-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(56,189,248,.1)] max-w-sm w-full mx-4">
+            <div className="bg-[rgba(3,15,30,0.95)] border border-green-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(74,222,128,.1)] max-w-sm w-full mx-4">
               <div className="flex items-center gap-4">
-                <div className="h-px w-12 bg-linear-to-r from-transparent to-sky-400/30" />
-                <span className="text-sky-400/50 text-base">⚓</span>
-                <div className="h-px w-12 bg-linear-to-l from-transparent to-sky-400/30" />
+                <div className="h-px w-12 bg-linear-to-r from-transparent to-green-400/30" />
+                <span className="text-green-400/50 text-base">⚓</span>
+                <div className="h-px w-12 bg-linear-to-l from-transparent to-green-400/30" />
               </div>
               <div className="text-center">
-                <h2
-                  className="font-[Cinzel_Decorative] text-2xl text-sky-300 tracking-wider"
-                  style={{ textShadow: "0 0 30px rgba(56,189,248,.35)" }}
-                >
-                  Flota Trobada!
+                <h2 className="font-[Cinzel_Decorative] text-2xl text-green-300 tracking-wider"
+                  style={{ textShadow: "0 0 30px rgba(74,222,128,.35)" }}>
+                  Flota Salvada!
                 </h2>
-                <p className="font-[Cinzel] text-sky-400/50 text-xs tracking-[.2em] uppercase mt-2">
-                  Victòria
-                </p>
+                <p className="font-[Cinzel] text-green-400/50 text-xs tracking-[.2em] uppercase mt-2">Victòria</p>
               </div>
-              <div className="h-px w-full bg-linear-to-r from-transparent via-sky-400/15 to-transparent" />
+              <div className="h-px w-full bg-linear-to-r from-transparent via-green-400/15 to-transparent" />
+              <div className="flex gap-3">
+                <span className="active-pill cursor-auto">{shotsTaken} intents</span>
+                <span className="active-pill cursor-auto">{timerStr}</span>
+              </div>
+              <button onClick={() => navigate("/config")} className="btn">Nova partida</button>
+              <Link to="/" className="font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase text-sky-400/40 hover:text-sky-400/70 transition-colors">
+                Menú principal
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Loss overlay */}
+        {lost && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
+            <div className="bg-[rgba(3,15,30,0.95)] border border-red-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(248,56,56,.1)] max-w-sm w-full mx-4">
+              <div className="flex items-center gap-4">
+                <div className="h-px w-12 bg-linear-to-r from-transparent to-red-400/30" />
+                <span className="text-red-400/50 text-base">💀</span>
+                <div className="h-px w-12 bg-linear-to-l from-transparent to-red-400/30" />
+              </div>
+              <div className="text-center">
+                <h2 className="font-[Cinzel_Decorative] text-2xl text-red-300 tracking-wider"
+                  style={{ textShadow: "0 0 30px rgba(248,56,56,.35)" }}>
+                  {lostReason === "time" ? "Temps Esgotat!" : "Sense Intents!"}
+                </h2>
+                <p className="font-[Cinzel] text-red-400/50 text-xs tracking-[.2em] uppercase mt-2">Derrota</p>
+              </div>
+              <div className="h-px w-full bg-linear-to-r from-transparent via-red-400/15 to-transparent" />
               <div className="flex gap-3">
                 <span className="active-pill cursor-auto">{shotsTaken} intents</span>
                 <span className="active-pill cursor-auto">{timerStr}</span>
               </div>
               <button onClick={newGame} className="btn">Nova partida</button>
-              <Link
-                to="/"
-                className="font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase text-sky-400/40 hover:text-sky-400/70 transition-colors"
-              >
+              <Link to="/" className="font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase text-sky-400/40 hover:text-sky-400/70 transition-colors">
                 Menú principal
               </Link>
             </div>
@@ -277,14 +359,22 @@ export default function GamePage() {
         {/* 3 panels */}
         <div className="relative z-10 flex min-h-screen">
           <FleetPanel ships={ships} board={board} />
-                      <BoardPanel
-              board={board}
-              onCell={handleCell}
-              lastSunkShip={lastSunkShip}
-              onCloseSunk={() => setLastSunkShip(null)}
-              boardSize={boardSize}   // <-- nuevo
-            />
-          <SidePanel timerStr={timerStr} log={log} onAbandon={handleAbandon} />
+          <BoardPanel
+            board={board}
+            onCell={handleCell}
+            lastSunkShip={lastSunkShip}
+            onCloseSunk={() => setLastSunkShip(null)}
+            boardSize={boardSize}
+          />
+          <SidePanel
+            timerStr={timerStr}
+            log={log}
+            onAbandon={handleAbandon}
+            turnSeconds={turnSeconds}
+            timeLimit={timeLimit}
+            shotsTaken={shotsTaken}
+            maxShots={maxShots}
+          />
         </div>
       </div>
     </>
