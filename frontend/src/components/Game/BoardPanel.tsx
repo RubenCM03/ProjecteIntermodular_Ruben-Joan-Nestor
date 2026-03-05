@@ -11,10 +11,10 @@ interface Props {
 
 const SHIP_SVG: Record<string, string> = {
   "Portaavions": "/carrier_dark.svg",
-  "Cuirassat":   "/battleship_dark.svg",
-  "Destructor":  "/destroyer_dark.svg",
-  "Submarí":     "/submarine_dark.svg",
-  "Patrullera":  "/cruiser_dark.svg",
+  "Cuirassat": "/battleship_dark.svg",
+  "Destructor": "/destroyer_dark.svg",
+  "Submarí": "/submarine_dark.svg",
+  "Patrullera": "/cruiser_dark.svg",
 };
 
 function BoardCell({
@@ -30,8 +30,8 @@ function BoardCell({
 
   const cls: Record<CellState, string> = {
     empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
-    miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
-    hit:   "bg-yellow-400/15 border-yellow-400/50 cursor-default",
+    miss: "bg-sky-900/20 border-sky-400/15 cursor-default",
+    hit: "bg-yellow-400/15 border-yellow-400/50 cursor-default",
     found: "bg-green-400/15 border-green-400/50 cursor-default",
   };
 
@@ -131,7 +131,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
         <div className="flex items-center gap-4 mb-5 justify-center">
           <div className="h-px w-12 bg-linear-to-r from-transparent to-sky-400/30" />
           <span className="font-[Cinzel] text-[.6rem] tracking-[.25em] uppercase text-sky-400/50">
-            Taulell de combat
+            Taulell de joc
           </span>
           <div className="h-px w-12 bg-linear-to-l from-transparent to-sky-400/30" />
         </div>

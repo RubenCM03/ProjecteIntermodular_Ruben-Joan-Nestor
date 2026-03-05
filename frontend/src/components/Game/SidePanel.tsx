@@ -53,14 +53,7 @@ export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeL
   return (
     <aside className="w-52 flex-shrink-0 border-l border-sky-400/10 bg-[rgba(3,15,30,0.5)] backdrop-blur-xl p-5 flex flex-col gap-5 overflow-hidden min-h-screen">
 
-      {/* Decorative header */}
-      <div className="flex items-center gap-3 pt-1 animate-[fadeInUp_.6s_ease_.2s_forwards] opacity-0">
-        <div className="h-px flex-1 bg-linear-to-r from-transparent to-sky-400/25" />
-        <span className="font-[Cinzel] text-[.55rem] tracking-[.25em] uppercase text-sky-400/40">Combat</span>
-        <div className="h-px flex-1 bg-linear-to-l from-transparent to-sky-400/25" />
-      </div>
 
-      {/* Global timer */}
       <div className="animate-[fadeInUp_.6s_ease_.3s_forwards] opacity-0 flex-shrink-0">
         <PanelTitle>Temporitzador</PanelTitle>
         <div className="bg-[rgba(3,15,30,0.65)] border border-sky-400/10 rounded-xl p-4 text-center">
@@ -78,7 +71,6 @@ export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeL
 
       <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent flex-shrink-0" />
 
-      {/* Turn timer — only shown if timeLimit > 0 */}
       {timeLimit > 0 && (
         <div className="flex-shrink-0">
           <PanelTitle>Temps per torn</PanelTitle>
@@ -97,8 +89,8 @@ export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeL
             <div className="h-1 rounded-full bg-sky-400/8 border border-sky-400/10 overflow-hidden mt-3">
               <div
                 className={`h-full rounded-full transition-all duration-1000 ${turnSeconds >= timeLimit * 0.75
-                    ? "bg-linear-to-r from-red-500/60 to-red-300/80"
-                    : "bg-linear-to-r from-sky-500/60 to-sky-300/80"
+                  ? "bg-linear-to-r from-red-500/60 to-red-300/80"
+                  : "bg-linear-to-r from-sky-500/60 to-sky-300/80"
                   }`}
                 style={{
                   width: `${Math.max(0, ((timeLimit - turnSeconds) / timeLimit) * 100)}%`,
@@ -112,7 +104,6 @@ export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeL
         </div>
       )}
 
-      {/* Shots counter */}
       <div className="flex-shrink-0">
         <PanelTitle>Intents</PanelTitle>
         <div className="bg-[rgba(3,15,30,0.65)] border border-sky-400/10 rounded-xl p-4 text-center">
