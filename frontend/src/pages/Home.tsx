@@ -19,10 +19,10 @@ export default function Home() {
             </p>
 
             <div className="fade-in-3 flex gap-3 mb-10 flex-wrap justify-center">
-                {['1 Jugador', '10×10 Tauler', 'Torn a torn'].map((stat) => (
+                {['1 Jugador', '10×10 / 12x12 Tauler', 'Torn a torn'].map((stat) => (
                     <span
                         key={stat}
-                        className="font-cinzel text-xs tracking-widest uppercase px-4 py-1.5 rounded-full border border-sky-500/25 bg-sky-500/5 text-sky-300/70"
+                        className="pill cursor-auto"
                     >
                         {stat}
                     </span>

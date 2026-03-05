@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Logo from "../components/Logo"
 
 const DEFAULT_SHIPS = [
-    { id: 1, size: 5 },  // Portaavions
-    { id: 2, size: 4 },  // Cuirassat
-    { id: 3, size: 3 },  // Creuer
-    { id: 4, size: 3 },  // Submarí
-    { id: 5, size: 2 },  // Patrullera
+    { id: 1, size: 5 },
+    { id: 2, size: 4 },
+    { id: 3, size: 3 },
+    { id: 4, size: 3 },
+    { id: 5, size: 2 },
 ];
 
 const SHOTS_OPTIONS = [
@@ -23,7 +22,7 @@ export default function GameConfig() {
     const navigate = useNavigate();
     const [boardSize, setBoardSize] = useState(10);
     const [ships, setShips] = useState(DEFAULT_SHIPS);
-    const [maxShots, setMaxShots] = useState(0); // 0 = auto
+    const [maxShots, setMaxShots] = useState(0);
     const [salvoMode, setSalvoMode] = useState(false);
 
     const handleStartGame = () => {
@@ -45,7 +44,6 @@ export default function GameConfig() {
             </div>
 
             <div className="card">
-                {/* Taulell */}
                 <div>
                     <p className="form-title">Tamany del taulell</p>
                     <div className="flex gap-2 flex-wrap">
@@ -58,9 +56,8 @@ export default function GameConfig() {
                     </div>
                 </div>
 
-                <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
+                <div className="separator-line" />
 
-                {/* Vaixells */}
                 <div>
                     <div className="flex items-center justify-between mb-3">
                         <p className="form-title">Vaixells ({ships.length}/6)</p>
@@ -79,7 +76,7 @@ export default function GameConfig() {
                                     Vaixell {i + 1}
                                 </span>
                                 <div className="flex gap-1 flex-1">
-                                    {Array.from({ length: 4}).map((_, j) => (
+                                    {Array.from({ length: 4 }).map((_, j) => (
                                         <div key={j} className={`${j < ship.size - 1 ? "config-bar" : "config-bar-active"}`} />
                                     ))}
                                 </div>
@@ -98,9 +95,8 @@ export default function GameConfig() {
                     </div>
                 </div>
 
-                <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
+                <div className="separator-line" />
 
-                {/* Dispars màxims */}
                 <div>
                     <p className="form-title">Intents màxims</p>
                     <p className="font-[Cinzel] text-sky-300/45 text-xs mb-3">
@@ -119,31 +115,13 @@ export default function GameConfig() {
                             <button onClick={() => setMaxShots(v => Math.max(10, v - 5))} className="small-btn">−</button>
                             <span className="font-[Cinzel] text-sky-300 text-sm w-8 text-center">{maxShots}</span>
                             <button onClick={() => setMaxShots(v => Math.min(200, v + 5))} className="small-btn">+</button>
-                            <span className="font-[Cinzel] text-sky-400/40 text-[.6rem] tracking-[.1em] uppercase">dispars</span>
+                            <span className="font-[Cinzel] text-sky-400/40 text-[.6rem] tracking-[.1em] uppercase">torns</span>
                         </div>
                     )}
                 </div>
 
-                <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
-
-                {/* Mode Salva */}
-                <div className="flex items-start gap-4 justify-between">
-                    <div className="flex-1">
-                        <p className="form-title">Mode Salva</p>
-                        <p className="font-[Cinzel] text-sky-300/45 text-xs leading-relaxed">
-                            Si el jugador enfonsa un vaixell, continua disparant fins que toca aigua.
-                        </p>
-                    </div>
-                    <button onClick={() => setSalvoMode(v => !v)} aria-label="Activar mode salva"
-                        className={`relative mt-1 w-[50px] h-[26px] rounded-full border flex-shrink-0 cursor-pointer transition-all duration-300
-                            ${salvoMode ? "bg-sky-400/30 border-sky-400/55" : "bg-sky-400/10 border-sky-400/20"}`}>
-                        <span className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300
-                            ${salvoMode ? "translate-x-6 bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,.7)]" : "bg-sky-400/45"}`} />
-                    </button>
-                </div>
             </div>
 
-            {/* Resum */}
             <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-8 gap-4">
                 <div className="flex gap-2 flex-wrap justify-center">
                     {[
