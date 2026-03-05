@@ -10,11 +10,10 @@ use Illuminate\Http\Request;
 
 class GameController extends Controller
 {
-    // Configuració dels vaixells
     private array $defaultShipConfig = [
         ['name' => 'Portaavions', 'size' => 5],
         ['name' => 'Cuirassat',   'size' => 4],
-        ['name' => 'Creuer',  'size' => 3],
+        ['name' => 'Creuer',      'size' => 3],
         ['name' => 'Submarí',     'size' => 3],
         ['name' => 'Patrullera',  'size' => 2],
     ];
@@ -22,13 +21,13 @@ class GameController extends Controller
     public function create(Request $request)
     {
         $request->validate([
-            'board_size'          => 'integer|min:8|max:15',
-            'ships'               => 'array|min:1|max:10',
-            'ships.*.size'        => 'required_with:ships|integer|min:1|max:6',
-            'time_limit'          => 'nullable|integer|min:60|max:3600',
+            'board_size'   => 'integer|min:8|max:15',
+            'ships'        => 'array|min:1|max:10',
+            'ships.*.size' => 'required_with:ships|integer|min:1|max:6',
+            'max_shots'    => 'nullable|integer|min:10|max:200',
         ]);
 
-        // Si el jugador ja té una partida en curs, la retornem
+        // Si ja té una partida en curs, la retornem
         $activeGame = Game::where('user_id', $request->user()->id)
             ->where('status', GameStatus::PLAYING)
             ->first();
@@ -47,14 +46,19 @@ class GameController extends Controller
                 'size' => $ship['size'],
             ])->toArray();
 
+        // Si el frontend envia max_shots, l'usem; si no, el calculem automàticament
+        $maxShots = $request->input('max_shots')
+            ? (int) $request->input('max_shots')
+            : $this->calculateMaxShots($boardSize, $shipConfig);
+
         $game = Game::create([
             'user_id'     => $request->user()->id,
             'status'      => GameStatus::PLAYING,
             'shots_taken' => 0,
-            'max_shots'   => $this->calculateMaxShots($boardSize, $shipConfig),
+            'max_shots'   => $maxShots,
             'board_size'  => $boardSize,
             'ship_config' => $shipConfig,
-            'time_limit'  => $request->input('time_limit'),
+            'time_limit'  => null,
             'started_at'  => now(),
         ]);
 
@@ -68,12 +72,10 @@ class GameController extends Controller
 
     private function calculateMaxShots(int $boardSize, array $shipConfig): int
     {
-        // Total de cel·les dels vaixells * 2.5 arrodonit, mínim 20
         $totalShipCells = array_sum(array_column($shipConfig, 'size'));
         return max(20, (int) round($totalShipCells * 2.5));
     }
 
-    // Obtenir estat de la partida actual
     public function show(Request $request)
     {
         $game = Game::where('user_id', $request->user()->id)
@@ -87,30 +89,11 @@ class GameController extends Controller
             ], 404);
         }
 
-        // Comprovar si s'ha acabat el temps
-        if ($game->time_limit !== null) {
-            $elapsed = (int) $game->started_at->diffInSeconds(now());
-
-            if ($elapsed >= $game->time_limit) {
-                $game->update([
-                    'status'      => GameStatus::LOST,
-                    'finished_at' => now(),
-                ]);
-
-                return response()->json([
-                    'message'   => 'La partida ha expirat per temps',
-                    'game_over' => true,
-                    'status'    => GameStatus::LOST->value,
-                ], 200);
-            }
-        }
-
         return response()->json([
             'game' => $this->formatGame($game),
         ]);
     }
 
-    // Abandonar partida
     public function abandon(Request $request)
     {
         $game = Game::where('user_id', $request->user()->id)
@@ -207,42 +190,21 @@ class GameController extends Controller
     private function formatGame(Game $game): array
     {
         $game->load('shots');
-        $timeInfo = $this->getTimeInfo($game);
 
         return [
-            'id'                => $game->id,
-            'status'            => $game->status->value,
-            'board_size'        => $game->board_size,
-            'shots_taken'       => $game->shots_taken,
-            'max_shots'         => $game->max_shots,
-            'shots_left'        => $game->max_shots - $game->shots_taken,
-            'time_limit'        => $game->time_limit,
-            'time_elapsed'      => $timeInfo['elapsed'],
-            'time_left'         => $timeInfo['left'],
-            'started_at'        => $game->started_at,
-            'finished_at'       => $game->finished_at,
-            'shots'             => $game->shots->map(fn($s) => [
+            'id'           => $game->id,
+            'status'       => $game->status->value,
+            'board_size'   => $game->board_size,
+            'shots_taken'  => $game->shots_taken,
+            'max_shots'    => $game->max_shots,
+            'shots_left'   => $game->max_shots - $game->shots_taken,
+            'started_at'   => $game->started_at,
+            'finished_at'  => $game->finished_at,
+            'shots'        => $game->shots->map(fn($s) => [
                 'row'    => $s->row,
                 'col'    => $s->col,
                 'result' => $s->result->value,
             ]),
         ];
-    }
-
-    private function getTimeInfo(Game $game): array
-    {
-        if (!$game->started_at) {
-            return ['elapsed' => 0, 'left' => $game->time_limit];
-        }
-
-        $elapsed = (int) $game->started_at->diffInSeconds(now());
-
-        if ($game->time_limit === null) {
-            return ['elapsed' => $elapsed, 'left' => null];
-        }
-
-        $left = max(0, $game->time_limit - $elapsed);
-
-        return ['elapsed' => $elapsed, 'left' => $left];
     }
 }

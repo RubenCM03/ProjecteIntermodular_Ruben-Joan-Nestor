@@ -22,6 +22,12 @@ export default function Navbar() {
             >
                 Trobar la Flota
             </Link>
+            <Link
+    to="/ranking"
+    className="font-cinzel text-sky-400/60 text-xs uppercase tracking-widest hover:text-sky-300/80 transition-colors duration-200"
+>
+    Rànquing
+</Link>
 
             <div className="flex items-center gap-4">
                 {loading ? (

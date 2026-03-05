@@ -75,7 +75,15 @@ export interface ApiGame {
     result: "hit" | "miss" | "sunk"; // ShotResult enum values
   }[];
 }
-
+// En api.ts, interfície ShotResponse
+export interface ShotResponse {
+  result: "hit" | "miss" | "sunk";
+  shots_taken: number;
+  game_over?: boolean;
+  status?: string;
+  sunk_ship?: string;
+  sunk_size?: number;
+}
 export interface ApiCreateResponse {
   message: string;
   game: ApiGame;

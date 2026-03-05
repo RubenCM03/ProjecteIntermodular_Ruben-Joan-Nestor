@@ -70,35 +70,35 @@ class StatsController extends Controller
     }
 
     // Ranking global
-    public function ranking()
-    {
-        $ranking = User::where('role', 'player')
-            ->withCount([
-                'games as total_games' => fn($q) => $q->whereIn('status', [GameStatus::WON, GameStatus::LOST]),
-                'games as won_games'   => fn($q) => $q->where('status', GameStatus::WON),
-            ])
-            ->withMin([
-                'games as best_score' => 'shots_taken'
-            ], 'shots_taken')
-            ->having('total_games', '>', 0)
-            ->orderByDesc('won_games')
-            ->orderBy('best_score')
-            ->limit(10)
-            ->get()
-            ->map(fn($user) => [
-                'name'        => $user->name,
-                'total_games' => $user->total_games,
-                'won_games'   => $user->won_games,
-                'win_rate'    => $user->total_games > 0
-                    ? round(($user->won_games / $user->total_games) * 100, 2) . '%'
-                    : '0%',
-                'best_score'  => $user->best_score,
-            ]);
+public function ranking()
+{
+    $ranking = User::where('role', 'player')
+        ->withCount([
+            'games as total_games' => fn($q) => $q->whereIn('status', [GameStatus::WON, GameStatus::LOST]),
+            'games as won_games'   => fn($q) => $q->where('status', GameStatus::WON),
+        ])
+        ->get()
+        ->filter(fn($user) => $user->total_games > 0)
+        ->map(fn($user) => [
+            'name'        => $user->name,
+            'total_games' => $user->total_games,
+            'won_games'   => $user->won_games,
+            'win_rate'    => $user->total_games > 0
+                ? round(($user->won_games / $user->total_games) * 100, 2) . '%'
+                : '0%',
+            'best_score'  => Game::where('user_id', $user->id)
+                ->where('status', GameStatus::WON)
+                ->min('shots_taken'),
+        ])
+        ->sortByDesc('won_games')
+        ->sortBy('best_score')
+        ->take(10)
+        ->values();
 
-        return response()->json([
-            'ranking' => $ranking,
-        ]);
-    }
+    return response()->json([
+        'ranking' => $ranking,
+    ]);
+}
 
     // Estadístiques globals (només admin)
     public function globalStats()

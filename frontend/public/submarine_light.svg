@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 160" width="450" height="160">
+  <!-- Main body -->
+  <ellipse cx="220" cy="105" rx="195" ry="30" fill="#c8d4e0"/>
+  <!-- Conning tower -->
+  <rect x="165" y="68" width="55" height="38" rx="5" fill="#9aafc2"/>
+  <!-- Periscopes -->
+  <line x1="175" y1="68" x2="175" y2="45" stroke="#8a9fb5" stroke-width="3"/>
+  <line x1="175" y1="45" x2="175" y2="38" stroke="#adbccc" stroke-width="2"/>
+  <line x1="188" y1="68" x2="188" y2="50" stroke="#8a9fb5" stroke-width="2.5"/>
+  <line x1="200" y1="68" x2="200" y2="55" stroke="#8a9fb5" stroke-width="2"/>
+  <!-- Conning tower windows -->
+  <circle cx="205" cy="82" r="4" fill="#6a8099"/>
+  <circle cx="195" cy="82" r="4" fill="#6a8099"/>
+  <!-- Propeller -->
+  <circle cx="412" cy="105" r="3" fill="#8a9fb5"/>
+  <ellipse cx="412" cy="93" rx="4" ry="10" fill="#8a9fb5" transform="rotate(-20, 412, 105)"/>
+  <ellipse cx="412" cy="117" rx="4" ry="10" fill="#8a9fb5" transform="rotate(20, 412, 105)"/>
+  <ellipse cx="420" cy="105" rx="10" ry="4" fill="#8a9fb5" transform="rotate(70, 412, 105)"/>
+  <ellipse cx="404" cy="105" rx="10" ry="4" fill="#8a9fb5" transform="rotate(-70, 412, 105)"/>
+  <!-- Hull detail lines -->
+  <line x1="60" y1="105" x2="380" y2="105" stroke="#adbccc" stroke-width="1" opacity="0.4"/>
+  <!-- Bow torpedo doors -->
+  <circle cx="30" cy="99" r="4" fill="#8a9fb5"/>
+  <circle cx="30" cy="111" r="4" fill="#8a9fb5"/>
+  <!-- Diving planes -->
+  <path d="M120 105 L100 92 L115 92 L130 105 Z" fill="#8a9fb5"/>
+  <path d="M120 105 L100 118 L115 118 L130 105 Z" fill="#8a9fb5"/>
+  <!-- Label -->
+  <text x="220" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4a6a85" letter-spacing="3">SUBMARINE</text>
+</svg>

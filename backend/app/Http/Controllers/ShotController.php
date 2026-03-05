@@ -109,6 +109,7 @@ class ShotController extends Controller
 
         if ($result === ShotResult::SUNK) {
             $response['sunk_ship'] = $hitShip->name;
+            $response['sunk_size'] = $hitShip->size; 
         }
 
         if ($gameOver) {

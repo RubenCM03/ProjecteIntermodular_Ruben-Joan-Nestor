@@ -5,6 +5,8 @@ import GameConfig from "./pages/GameConfig"
 import Game from "./pages/Game"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
+import Ranking from "./pages/Ranking"
+
 const BUBBLES = [
   { w: 8, l: '8%', dur: '9s', del: '0s' },
   { w: 5, l: '18%', dur: '12s', del: '2s' },
@@ -62,6 +64,7 @@ function App() {
             <Route path="/game" element={<Game />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/ranking" element={<Ranking />} />
           </Routes>
         </main>
       </div>

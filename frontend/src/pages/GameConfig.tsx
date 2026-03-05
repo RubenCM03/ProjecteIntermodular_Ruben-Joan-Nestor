@@ -1,36 +1,35 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import type { GameConfig } from "../api";
+import Logo from "../components/Logo"
 
 const DEFAULT_SHIPS = [
-    { id: 1, size: 2 },
-    { id: 2, size: 3 },
-    { id: 3, size: 4 },
-    { id: 4, size: 5 },
+    { id: 1, size: 5 },  // Portaavions
+    { id: 2, size: 4 },  // Cuirassat
+    { id: 3, size: 3 },  // Creuer
+    { id: 4, size: 3 },  // Submarí
+    { id: 5, size: 2 },  // Patrullera
 ];
 
-const TIME_OPTIONS = [
-    { label: "Sense límit", value: 0 },
-    { label: "30 seg", value: 30 },
-    { label: "1 min", value: 60 },
-    { label: "2 min", value: 120 },
+const SHOTS_OPTIONS = [
+    { label: "Auto", value: 0 },
+    { label: "20", value: 20 },
+    { label: "30", value: 30 },
+    { label: "40", value: 40 },
+    { label: "50", value: 50 },
+    { label: "60", value: 60 },
 ];
 
 export default function GameConfig() {
     const navigate = useNavigate();
     const [boardSize, setBoardSize] = useState(10);
     const [ships, setShips] = useState(DEFAULT_SHIPS);
-    const [timeLimit, setTimeLimit] = useState(0);
+    const [maxShots, setMaxShots] = useState(0); // 0 = auto
     const [salvoMode, setSalvoMode] = useState(false);
 
     const handleStartGame = () => {
-        const config: GameConfig = {
-            board_size: boardSize,
-            ships: ships.map(s => ({ size: s.size })),
-            time_limit: timeLimit === 0 ? null : timeLimit,
-            salvo_mode: salvoMode,
-        };
-        navigate("/game", { state: config });
+        navigate("/game", {
+            state: { boardSize, ships, maxShots, salvoMode }
+        });
     };
 
     return (
@@ -46,15 +45,13 @@ export default function GameConfig() {
             </div>
 
             <div className="card">
+                {/* Taulell */}
                 <div>
                     <p className="form-title">Tamany del taulell</p>
                     <div className="flex gap-2 flex-wrap">
                         {[10, 12].map(s => (
-                            <button
-                                key={s}
-                                onClick={() => setBoardSize(s)}
-                                className={`${boardSize === s ? "active-pill" : "pill"}`}
-                            >
+                            <button key={s} onClick={() => setBoardSize(s)}
+                                className={`${boardSize === s ? "active-pill" : "pill"}`}>
                                 {s}×{s}
                             </button>
                         ))}
@@ -63,57 +60,37 @@ export default function GameConfig() {
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
+                {/* Vaixells */}
                 <div>
                     <div className="flex items-center justify-between mb-3">
-                        <p className="form-title">
-                            Vaixells ({ships.length}/6)
-                        </p>
+                        <p className="form-title">Vaixells ({ships.length}/6)</p>
                         <div className="flex gap-1">
-                            <button
-                                onClick={() => setShips(prev => prev.length > 1 ? prev.slice(0, -1) : prev)}
-                                disabled={ships.length <= 1}
-                                className="small-btn"
-                            >−</button>
-                            <button
-                                onClick={() => setShips(prev => prev.length < 6 ? [...prev, { id: Date.now(), size: 3 }] : prev)}
-                                disabled={ships.length >= 6}
-                                className="small-btn"
-                            >+</button>
+                            <button onClick={() => setShips(prev => prev.length > 1 ? prev.slice(0, -1) : prev)}
+                                disabled={ships.length <= 1} className="small-btn">−</button>
+                            <button onClick={() => setShips(prev => prev.length < 6 ? [...prev, { id: Date.now(), size: 3 }] : prev)}
+                                disabled={ships.length >= 6} className="small-btn">+</button>
                         </div>
                     </div>
                     <div className="flex flex-col">
                         {ships.map((ship, i) => (
-                            <div
-                                key={ship.id}
-                                className="flex items-center gap-3 py-2.5 px-2 rounded-lg border-b border-sky-400/6 last:border-b-0 hover:bg-sky-400/4 transition-colors duration-200"
-                            >
+                            <div key={ship.id}
+                                className="flex items-center gap-3 py-2.5 px-2 rounded-lg border-b border-sky-400/6 last:border-b-0 hover:bg-sky-400/4 transition-colors duration-200">
                                 <span className="font-[Cinzel] text-sky-300/45 text-[.65rem] tracking-[.15em] uppercase w-auto shrink-0">
                                     Vaixell {i + 1}
                                 </span>
-
                                 <div className="flex gap-1 flex-1">
                                     {Array.from({ length: 5 }).map((_, j) => (
-                                        <div
-                                            key={j}
-                                            className={`${j < ship.size ? "config-bar" : "config-bar-active"}`}
-                                        />
+                                        <div key={j} className={`${j < ship.size - 1 ? "config-bar" : "config-bar-active"}`} />
                                     ))}
                                 </div>
-
                                 <div className="flex flex-col items-center gap-1">
                                     <span className="font-[Cinzel] text-[.58rem] tracking-[.2em] uppercase text-sky-300/45">Mida</span>
                                     <div className="flex items-center gap-1">
-                                        <button
-                                            onClick={() => setShips(prev => prev.map(s => s.id === ship.id ? { ...s, size: Math.max(2, s.size - 1) } : s))}
-                                            disabled={ship.size <= 2}
-                                            className="small-btn"
-                                        >−</button>
+                                        <button onClick={() => setShips(prev => prev.map(s => s.id === ship.id ? { ...s, size: Math.max(2, s.size - 1) } : s))}
+                                            disabled={ship.size <= 2} className="small-btn">−</button>
                                         <span className="font-[Cinzel] text-sky-300 text-sm w-4 text-center">{ship.size}</span>
-                                        <button
-                                            onClick={() => setShips(prev => prev.map(s => s.id === ship.id ? { ...s, size: Math.min(5, s.size + 1) } : s))}
-                                            disabled={ship.size >= 5}
-                                            className="small-btn"
-                                        >+</button>
+                                        <button onClick={() => setShips(prev => prev.map(s => s.id === ship.id ? { ...s, size: Math.min(5, s.size + 1) } : s))}
+                                            disabled={ship.size >= 5} className="small-btn">+</button>
                                     </div>
                                 </div>
                             </div>
@@ -123,43 +100,63 @@ export default function GameConfig() {
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
+                {/* Dispars màxims */}
                 <div>
-                    <p className="form-title">Temps límit per torn</p>
+                    <p className="form-title">Intents màxims</p>
+                    <p className="font-[Cinzel] text-sky-300/45 text-xs mb-3">
+                        Auto calcula els intents segons els vaixells. O tria un número fix.
+                    </p>
                     <div className="flex gap-2 flex-wrap">
-                        {TIME_OPTIONS.map(opt => (
-                            <button
-                                key={opt.value}
-                                onClick={() => setTimeLimit(opt.value)}
-                                className={`${timeLimit === opt.value ? "active-pill" : "pill"}`}
-                            >
+                        {SHOTS_OPTIONS.map(opt => (
+                            <button key={opt.value} onClick={() => setMaxShots(opt.value)}
+                                className={`${maxShots === opt.value ? "active-pill" : "pill"}`}>
                                 {opt.label}
                             </button>
                         ))}
                     </div>
+                    {maxShots > 0 && (
+                        <div className="flex items-center gap-3 mt-3">
+                            <button onClick={() => setMaxShots(v => Math.max(10, v - 5))} className="small-btn">−</button>
+                            <span className="font-[Cinzel] text-sky-300 text-sm w-8 text-center">{maxShots}</span>
+                            <button onClick={() => setMaxShots(v => Math.min(200, v + 5))} className="small-btn">+</button>
+                            <span className="font-[Cinzel] text-sky-400/40 text-[.6rem] tracking-[.1em] uppercase">dispars</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
+                {/* Mode Salva */}
+                <div className="flex items-start gap-4 justify-between">
+                    <div className="flex-1">
+                        <p className="form-title">Mode Salva</p>
+                        <p className="font-[Cinzel] text-sky-300/45 text-xs leading-relaxed">
+                            Si el jugador enfonsa un vaixell, continua disparant fins que toca aigua.
+                        </p>
+                    </div>
+                    <button onClick={() => setSalvoMode(v => !v)} aria-label="Activar mode salva"
+                        className={`relative mt-1 w-[50px] h-[26px] rounded-full border flex-shrink-0 cursor-pointer transition-all duration-300
+                            ${salvoMode ? "bg-sky-400/30 border-sky-400/55" : "bg-sky-400/10 border-sky-400/20"}`}>
+                        <span className={`absolute top-[3px] left-[3px] w-[18px] h-[18px] rounded-full transition-all duration-300
+                            ${salvoMode ? "translate-x-6 bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,.7)]" : "bg-sky-400/45"}`} />
+                    </button>
+                </div>
             </div>
 
-            <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-4 gap-4">
+            {/* Resum */}
+            <div className="animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0 flex flex-col items-center mt-8 gap-4">
                 <div className="flex gap-2 flex-wrap justify-center">
                     {[
                         `${boardSize}×${boardSize}`,
                         `${ships.length} vaixells`,
-                        ...(timeLimit > 0 ? [`${timeLimit}s / torn`] : []),
-                        ...(salvoMode ? [`Mode Salva`] : []),
+                        maxShots > 0 ? `${maxShots} dispars` : "Dispars auto",
+                        ...(salvoMode ? ["Mode Salva"] : []),
                     ].map(label => (
-                        <span key={label} className="active-pill cursor-auto">
-                            {label}
-                        </span>
+                        <span key={label} className="active-pill cursor-auto">{label}</span>
                     ))}
                 </div>
-
-                <button onClick={handleStartGame} className="btn">
-                    Iniciar partida
-                </button>
+                <button onClick={handleStartGame} className="btn">Iniciar partida</button>
             </div>
         </div>
-    );
+    )
 }

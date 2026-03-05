@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { statsApi } from '../../api'
 import type { RankingEntry } from '../../api'
 import { useAuth } from '../../context/AuthContext'
@@ -15,6 +16,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
 
 export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClose }: Props) {
     const { user } = useAuth()
+    const navigate = useNavigate()
     const [ranking, setRanking] = useState<RankingEntry[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
@@ -85,7 +87,7 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
-                {/* Ranking */}
+                {/* Ranking preview */}
                 <div>
                     <PanelTitle>Rànquing Global</PanelTitle>
 
@@ -124,28 +126,21 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
                                             : 'border-sky-400/8 bg-transparent'
                                         }`}
                                 >
-                                    {/* Position */}
                                     <span className="w-5 text-center text-sm flex-shrink-0">
                                         {i < 3
                                             ? MEDALS[i]
                                             : <span className="font-[Cinzel] text-[.55rem] text-sky-400/35">{i + 1}</span>
                                         }
                                     </span>
-
-                                    {/* Name */}
                                     <span className={`font-[Cinzel] text-[.6rem] tracking-[.05em] flex-1 truncate
                                         ${isMe ? 'text-sky-300' : 'text-sky-100/60'}`}
                                     >
                                         {entry.name}
                                         {isMe && <span className="ml-1.5 text-sky-400/40">← tu</span>}
                                     </span>
-
-                                    {/* Won */}
                                     <span className="font-[Cinzel] text-[.55rem] text-sky-400/45 flex-shrink-0">
                                         {entry.won_games}V
                                     </span>
-
-                                    {/* Best score */}
                                     <span className="font-[Cinzel] text-[.6rem] text-sky-300/60 flex-shrink-0 w-10 text-right">
                                         {entry.best_score}🎯
                                     </span>
@@ -159,18 +154,12 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
 
                 {/* Buttons */}
                 <div className="flex gap-2">
+                    
                     <button
                         onClick={onPlayAgain}
-                        className="flex-1 py-2.5 px-3 rounded-xl border border-sky-400/30 bg-sky-400/8 text-sky-300 font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase hover:bg-sky-400/15 hover:border-sky-400/50 transition-all duration-200 cursor-pointer"
-                        style={{ textShadow: '0 0 10px rgba(56,189,248,.3)' }}
-                    >
-                        Nova partida
-                    </button>
-                    <button
-                        onClick={onClose}
                         className="py-2.5 px-3 rounded-xl border border-sky-400/8 bg-transparent text-sky-400/40 font-[Cinzel] text-[.6rem] tracking-[.2em] uppercase hover:bg-sky-400/5 hover:text-sky-400/60 transition-all duration-200 cursor-pointer"
                     >
-                        Tancar
+                        Nova partida
                     </button>
                 </div>
 

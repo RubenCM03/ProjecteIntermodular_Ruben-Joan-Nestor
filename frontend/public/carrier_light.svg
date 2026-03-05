@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200">
+  <!-- Hull -->
+  <path d="M20 130 L480 130 L460 155 L40 155 Z" fill="#c8d4e0"/>
+  <!-- Flight deck -->
+  <rect x="30" y="110" width="440" height="22" rx="2" fill="#adbccc"/>
+  <!-- Island superstructure -->
+  <rect x="340" y="75" width="60" height="37" fill="#9aafc2"/>
+  <rect x="350" y="60" width="15" height="17" fill="#8a9fb5"/>
+  <rect x="370" y="65" width="10" height="12" fill="#8a9fb5"/>
+  <!-- Mast -->
+  <line x1="357" y1="60" x2="357" y2="35" stroke="#6a8099" stroke-width="2"/>
+  <line x1="357" y1="42" x2="375" y2="42" stroke="#6a8099" stroke-width="1.5"/>
+  <!-- Radar -->
+  <circle cx="357" cy="35" r="4" fill="none" stroke="#6a8099" stroke-width="1.5"/>
+  <!-- Aircraft on deck -->
+  <g fill="#6a8099">
+    <ellipse cx="80" cy="109" rx="20" ry="4"/>
+    <line x1="80" y1="109" x2="80" y2="104" stroke="#6a8099" stroke-width="1.5"/>
+    <line x1="67" y1="106" x2="93" y2="106" stroke="#6a8099" stroke-width="2"/>
+    <ellipse cx="160" cy="109" rx="20" ry="4"/>
+    <line x1="160" y1="109" x2="160" y2="104" stroke="#6a8099" stroke-width="1.5"/>
+    <line x1="147" y1="106" x2="173" y2="106" stroke="#6a8099" stroke-width="2"/>
+    <ellipse cx="240" cy="109" rx="20" ry="4"/>
+    <line x1="240" y1="109" x2="240" y2="104" stroke="#6a8099" stroke-width="1.5"/>
+    <line x1="227" y1="106" x2="253" y2="106" stroke="#6a8099" stroke-width="2"/>
+  </g>
+  <!-- Bow gun -->
+  <rect x="25" y="125" width="25" height="6" rx="2" fill="#8a9fb5"/>
+  <!-- Water line shadow -->
+  <path d="M20 155 Q250 160 480 155" stroke="#adbccc" stroke-width="2" fill="none" opacity="0.5"/>
+  <!-- Label -->
+  <text x="250" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4a6a85" letter-spacing="3">CARRIER</text>
+</svg>
