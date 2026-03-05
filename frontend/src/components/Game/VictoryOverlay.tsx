@@ -31,16 +31,13 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
     return (
         <div className="absolute inset-0 z-50 flex items-center justify-center">
 
-            {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-[rgba(2,8,16,0.85)] backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Panel */}
             <div className="relative w-full max-w-sm mx-4 rounded-2xl border border-sky-400/20 bg-[rgba(3,15,30,0.95)] backdrop-blur-xl p-6 flex flex-col gap-5 animate-[fadeInUp_.5s_ease_forwards]">
 
-                {/* Victory header */}
                 <div className="flex items-center gap-3">
                     <div className="h-px flex-1 bg-linear-to-r from-transparent to-sky-400/25" />
                     <span className="font-[Cinzel] text-[.55rem] tracking-[.25em] uppercase text-sky-400/40">
@@ -49,7 +46,6 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
                     <div className="h-px flex-1 bg-linear-to-l from-transparent to-sky-400/25" />
                 </div>
 
-                {/* Title */}
                 <div className="text-center flex flex-col gap-1.5">
                     <div
                         className="font-[Cinzel_Decorative] text-2xl text-sky-300 tracking-wider"
@@ -62,7 +58,6 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
                     </p>
                 </div>
 
-                {/* Stats row */}
                 <div className="grid grid-cols-2 gap-1.5">
                     {[
                         ['Dispars', shotsUsed],
@@ -87,7 +82,6 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
-                {/* Ranking preview */}
                 <div>
                     <PanelTitle>Rànquing Global</PanelTitle>
 
@@ -152,7 +146,6 @@ export default function VictoryOverlay({ shotsUsed, timeStr, onPlayAgain, onClos
 
                 <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
-                {/* Buttons */}
                 <div className="flex gap-2">
                     
                     <button

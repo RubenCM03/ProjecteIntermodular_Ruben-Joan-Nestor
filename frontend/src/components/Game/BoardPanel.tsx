@@ -113,13 +113,11 @@ function SunkShipPopup({ ship, onClose }: { ship: PlacedShip; onClose: () => voi
 }
 
 export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, boardSize }: Props) {
-  // Celdas más pequeñas para tableros más grandes
   const cellPx = boardSize <= 10 ? 40 : 32;
-  // Ancho del label de fila, proporcional
   const rowLabelW = cellPx - 8;
 
   const cols = Array.from({ length: boardSize }, (_, i) =>
-    String.fromCharCode(65 + i) // A, B, C... K, L
+    String.fromCharCode(65 + i)
   );
   const rows = Array.from({ length: boardSize }, (_, i) => i + 1);
 
@@ -141,7 +139,6 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
             <SunkShipPopup ship={lastSunkShip} onClose={onCloseSunk} />
           )}
 
-          {/* Cabecera de columnas */}
           <div className="flex mb-1.5" style={{ marginLeft: rowLabelW + 2 }}>
             {cols.map((c) => (
               <div
@@ -154,7 +151,6 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
             ))}
           </div>
 
-          {/* Filas */}
           <div className="flex flex-col gap-0.5">
             {rows.map((r) => (
               <div key={r} className="flex items-center gap-0.5">

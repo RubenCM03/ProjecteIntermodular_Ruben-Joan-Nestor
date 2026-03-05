@@ -22,23 +22,18 @@ function App() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#030b17]">
 
-      {/* Ocean depth gradient */}
       <div className="absolute inset-0 bg-linear-to-b from-[#020810] via-[#04101f] to-[#061828]" />
 
-      {/* Radial depth glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-sky-900/20 rounded-full blur-3xl" />
         <div className="absolute top-1/4 right-1/4 w-80 h-80 bg-blue-900/20 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-100 bg-cyan-950/20 rounded-full blur-3xl" />
       </div>
 
-      {/* Naval chart grid */}
       <div className="grid-overlay absolute inset-0" />
 
-      {/* Sonar scan line */}
       <div className="sonar-line" />
 
-      {/* Bubbles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {BUBBLES.map((b, i) => (
           <div

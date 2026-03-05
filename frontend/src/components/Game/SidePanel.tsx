@@ -45,7 +45,6 @@ function DiePip({ value }: { value: DiceFace }) {
 }
 
 export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeLimit, shotsTaken, maxShots }: Props) {
-  const [logOpen, setLogOpen] = useState(true);
 
   const shotsLeft = maxShots - shotsTaken;
   const shotsWarning = shotsLeft <= Math.ceil(maxShots * 0.25);
@@ -131,7 +130,6 @@ export default function SidePanel({ timerStr, log, onAbandon, turnSeconds, timeL
 
       <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent" />
 
-      {/* Abandon button */}
       <div className="animate-[fadeInUp_.6s_ease_.5s_forwards] opacity-0 flex-shrink-0">
         <button
           onClick={onAbandon}

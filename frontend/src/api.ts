@@ -1,4 +1,3 @@
-// ─── Base config ─────────────────────────────────────────
 const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000/api";
 
 async function request<T>(
@@ -30,9 +29,6 @@ const get = <T>(path: string) => request<T>("GET", path);
 const post = <T>(path: string, body?: unknown) =>
   request<T>("POST", path, body);
 
-// ─── Coordinate helpers ───────────────────────────────────
-// Server uses row/col (0-9). UI uses "A1"–"J10".
-// col 0="A"…9="J", row 0=1…9=10
 
 const COLS = ["A","B","C","D","E","F","G","H","I","J","K","L"] as const;
 
@@ -46,8 +42,6 @@ export function rowColToCoord(row: number, col: number): string {
   return `${COLS[col]}${row + 1}`;
 }
 
-// ─── Server response types ────────────────────────────────
-
 export interface AuthResponse {
   token: string;
   user: User;
@@ -60,22 +54,20 @@ export interface User {
   role: "player" | "admin";
 }
 
-// Shape returned by formatGame() in GameController
 export interface ApiGame {
   id: number;
-  status: "playing" | "won" | "lost"; // GameStatus enum values
+  status: "playing" | "won" | "lost";
   shots_taken: number;
   max_shots: number;
   shots_left: number;
   started_at: string;
   finished_at: string | null;
   shots: {
-    row: number; // 0-9
-    col: number; // 0-9
-    result: "hit" | "miss" | "sunk"; // ShotResult enum values
+    row: number;
+    col: number;
+    result: "hit" | "miss" | "sunk";
   }[];
 }
-// En api.ts, interfície ShotResponse
 export interface ShotResponse {
   result: "hit" | "miss" | "sunk";
   shots_taken: number;
@@ -94,10 +86,9 @@ export interface ApiShowResponse {
   game: ApiGame;
 }
 
-// Shot endpoint response (from ShotController)
 export interface ShotResponse {
   result: "hit" | "miss" | "sunk";
-  ship?: string; // ship name when sunk
+  ship?: string;
   won: boolean;
   game: ApiGame;
 }
@@ -138,7 +129,6 @@ export interface GameConfig {
   salvo_mode?: boolean;
 }
 
-// ─── Auth ─────────────────────────────────────────────────
 export const authApi = {
   register: (name: string, email: string, password: string) =>
     post<AuthResponse>("/register", { name, email, password }),
@@ -151,30 +141,20 @@ export const authApi = {
   me: () => get<User>("/user"),
 };
 
-// ─── Game ─────────────────────────────────────────────────
 export const gameApi = {
-  /** POST /game — crea o retorna la partida activa */
   create: (config?: GameConfig) =>
     post<ApiCreateResponse>("/game", config ?? {}),
 
-  /** GET /game — estat de la partida activa */
   show: () => get<ApiShowResponse>("/game"),
 
-  /** POST /game/abandon */
   abandon: () => post<{ message: string }>("/game/abandon"),
 
-  /**
-   * POST /game/shoot
-   * Envia row i col (0-9) al servidor.
-   * Accepta coord string "A5" i la converteix internament.
-   */
   shoot: (coord: string) => {
     const { row, col } = coordToRowCol(coord);
     return post<ShotResponse>("/game/shoot", { row, col });
   },
 };
 
-// ─── Stats ────────────────────────────────────────────────
 export const statsApi = {
   myStats: () => get<{ stats: Stats }>("/stats"),
   myHistory: () => get<{ history: HistoryEntry[] }>("/history"),
@@ -182,7 +162,6 @@ export const statsApi = {
   globalStats: () => get<{ global_stats: Stats }>("/admin/stats"),
 }
 
-// ─── Token helpers ────────────────────────────────────────
 export function saveToken(token: string) {
   localStorage.setItem("token", token);
 }

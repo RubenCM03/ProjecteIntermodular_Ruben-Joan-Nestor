@@ -313,7 +313,6 @@ export default function GamePage() {
           </div>
         )}
 
-        {/* Victory overlay */}
         {won && (
           <VictoryOverlay
             shotsUsed={shotsTaken}
@@ -323,7 +322,6 @@ export default function GamePage() {
           />
         )}
 
-        {/* Loss overlay */}
         {lost && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,15,30,.88)] backdrop-blur">
             <div className="bg-[rgba(3,15,30,0.95)] border border-red-400/20 rounded-2xl backdrop-blur-xl p-10 flex flex-col items-center gap-6 fade-up shadow-[0_0_40px_rgba(248,56,56,.1)] max-w-sm w-full mx-4">
