@@ -211,7 +211,7 @@ export default function GamePage() {
   addLog("found", `${coord} → Salvat ✓`);
 } else if (res.result === "hit") {
         setBoard((b) => ({ ...b, [coord]: "hit" }));
-        showMsg(`${coord} — ENCERT! 🎯`, "hit");
+        showMsg(`${coord} — ENCERT! `, "hit");
         addLog("hit", `${coord} → Encert`);
       } else {
         setBoard((b) => ({ ...b, [coord]: "miss" }));

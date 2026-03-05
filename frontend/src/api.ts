@@ -34,7 +34,7 @@ const post = <T>(path: string, body?: unknown) =>
 // Server uses row/col (0-9). UI uses "A1"–"J10".
 // col 0="A"…9="J", row 0=1…9=10
 
-const COLS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] as const;
+const COLS = ["A","B","C","D","E","F","G","H","I","J","K","L"] as const;
 
 export function coordToRowCol(coord: string): { row: number; col: number } {
   const col = COLS.indexOf(coord[0] as (typeof COLS)[number]);

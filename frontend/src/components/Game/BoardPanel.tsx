@@ -6,8 +6,9 @@ interface Props {
   onCell: (coord: string) => void;
   lastSunkShip: PlacedShip | null;
   onCloseSunk: () => void;
-  boardSize: number; 
+  boardSize: number;
 }
+
 const SHIP_SVG: Record<string, string> = {
   "Portaavions": "/carrier_dark.svg",
   "Cuirassat":   "/battleship_dark.svg",
@@ -16,15 +17,23 @@ const SHIP_SVG: Record<string, string> = {
   "Patrullera":  "/cruiser_dark.svg",
 };
 
-function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }) {
+function BoardCell({
+  state,
+  onClick,
+  cellPx,
+}: {
+  state: CellState;
+  onClick: () => void;
+  cellPx: number;
+}) {
   const [ripple, setRipple] = useState(false);
 
   const cls: Record<CellState, string> = {
-  empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
-  miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
-  hit:   "bg-yellow-400/15 border-yellow-400/50 cursor-default",   // amarillo
-  found: "bg-green-400/15 border-green-400/50 cursor-default",     // verde
-};
+    empty: "bg-[rgba(3,15,30,0.55)] border-sky-400/10 cursor-pointer hover:bg-sky-400/10 hover:border-sky-400/40 hover:scale-105",
+    miss:  "bg-sky-900/20 border-sky-400/15 cursor-default",
+    hit:   "bg-yellow-400/15 border-yellow-400/50 cursor-default",
+    found: "bg-green-400/15 border-green-400/50 cursor-default",
+  };
 
   function click() {
     if (state !== "empty") return;
@@ -37,12 +46,18 @@ function BoardCell({ state, onClick }: { state: CellState; onClick: () => void }
     <div
       onClick={click}
       className={`relative flex items-center justify-center rounded-md border transition-all duration-150 select-none ${cls[state]} ${state === "hit" ? "hit-pop" : ""}`}
-      style={{ width: 40, height: 40 }}
+      style={{ width: cellPx, height: cellPx }}
     >
       {ripple && <div className="cell-ripple" />}
-      {state === "miss" && <span className="text-sky-400/40 text-xl leading-none">·</span>}
-      {state === "hit"   && <span style={{ color: "#facc15", fontSize: 13, textShadow: "0 0 8px #facc15" }}>✕</span>}
-      {state === "found" && <span className="text-green-400 text-xs" style={{ textShadow: "0 0 10px rgba(74,222,128,.8)" }}>◆</span>}
+      {state === "miss" && (
+        <span className="text-sky-400/40 leading-none" style={{ fontSize: cellPx * 0.45 }}>·</span>
+      )}
+      {state === "hit" && (
+        <span style={{ color: "#facc15", fontSize: cellPx * 0.32, textShadow: "0 0 8px #facc15" }}>✕</span>
+      )}
+      {state === "found" && (
+        <span className="text-green-400" style={{ fontSize: cellPx * 0.28, textShadow: "0 0 10px rgba(74,222,128,.8)" }}>◆</span>
+      )}
     </div>
   );
 }
@@ -98,10 +113,16 @@ function SunkShipPopup({ ship, onClose }: { ship: PlacedShip; onClose: () => voi
 }
 
 export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, boardSize }: Props) {
+  // Celdas más pequeñas para tableros más grandes
+  const cellPx = boardSize <= 10 ? 40 : 32;
+  // Ancho del label de fila, proporcional
+  const rowLabelW = cellPx - 8;
+
   const cols = Array.from({ length: boardSize }, (_, i) =>
-    String.fromCharCode(65 + i) // A, B, C...
+    String.fromCharCode(65 + i) // A, B, C... K, L
   );
   const rows = Array.from({ length: boardSize }, (_, i) => i + 1);
+
   return (
     <main className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
       <div className="scanline" />
@@ -116,25 +137,30 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
         </div>
 
         <div className="bg-[rgba(3,15,30,0.65)] border border-sky-400/10 rounded-2xl backdrop-blur-xl p-5 relative">
-          {/* Popup barco hundido */}
           {lastSunkShip && (
             <SunkShipPopup ship={lastSunkShip} onClose={onCloseSunk} />
           )}
 
-          <div className="flex ml-[27px] mb-1.5">
+          {/* Cabecera de columnas */}
+          <div className="flex mb-1.5" style={{ marginLeft: rowLabelW + 2 }}>
             {cols.map((c) => (
-              <div key={c} className="font-[Cinzel] text-[10px] text-sky-400/40 text-center" style={{ width: 40 }}>
+              <div
+                key={c}
+                className="font-[Cinzel] text-[10px] text-sky-400/40 text-center"
+                style={{ width: cellPx }}
+              >
                 {c}
               </div>
             ))}
           </div>
 
+          {/* Filas */}
           <div className="flex flex-col gap-0.5">
             {rows.map((r) => (
               <div key={r} className="flex items-center gap-0.5">
                 <div
                   className="font-[Cinzel] text-[10px] text-sky-400/40 text-right pr-1.5 flex-shrink-0"
-                  style={{ width: 26 }}
+                  style={{ width: rowLabelW }}
                 >
                   {r}
                 </div>
@@ -145,6 +171,7 @@ export default function BoardPanel({ board, onCell, lastSunkShip, onCloseSunk, b
                       key={coord}
                       state={board[coord] ?? "empty"}
                       onClick={() => onCell(coord)}
+                      cellPx={cellPx}
                     />
                   );
                 })}
