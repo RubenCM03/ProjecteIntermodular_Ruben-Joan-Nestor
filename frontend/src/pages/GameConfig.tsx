@@ -79,7 +79,7 @@ export default function GameConfig() {
                                     Vaixell {i + 1}
                                 </span>
                                 <div className="flex gap-1 flex-1">
-                                    {Array.from({ length: 5 }).map((_, j) => (
+                                    {Array.from({ length: 4}).map((_, j) => (
                                         <div key={j} className={`${j < ship.size - 1 ? "config-bar" : "config-bar-active"}`} />
                                     ))}
                                 </div>
