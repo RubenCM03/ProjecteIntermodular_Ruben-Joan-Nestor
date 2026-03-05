@@ -183,19 +183,33 @@ export default function GamePage() {
 
       // Processar resultat del tir
       if (res.result === "sunk") {
-        setBoard((b) => ({ ...b, [coord]: "found" }));
-        const sunkSize = res.sunk_size ?? 0;
-        setShips((prev) => {
-          const idx = prev.findIndex((s) => !s.found && (sunkSize === 0 || s.size === sunkSize));
-          if (idx === -1) return prev;
-          const updated = [...prev];
-          updated[idx] = { ...updated[idx], found: true };
-          setLastSunkShip(updated[idx]);
-          return updated;
-        });
-        showMsg(`${coord} — SALVAT! ⚓`, "found");
-        addLog("found", `${coord} → Salvat ✓`);
-      } else if (res.result === "hit") {
+  // Marcar totes les cel·les del barco com "found"
+  setBoard((b) => {
+    const next = { ...b };
+    if (res.sunk_cells && res.sunk_cells.length > 0) {
+      res.sunk_cells.forEach(({ row, col }) => {
+        const c = rowColToCoord(row, col);
+        next[c] = "found";
+      });
+    } else {
+      next[coord] = "found"; // fallback
+    }
+    return next;
+  });
+
+  const sunkSize = res.sunk_size ?? 0;
+  setShips((prev) => {
+    const idx = prev.findIndex((s) => !s.found && (sunkSize === 0 || s.size === sunkSize));
+    if (idx === -1) return prev;
+    const updated = [...prev];
+    updated[idx] = { ...updated[idx], found: true };
+    setLastSunkShip(updated[idx]);
+    return updated;
+  });
+
+  showMsg(`${coord} — SALVAT! ⚓`, "found");
+  addLog("found", `${coord} → Salvat ✓`);
+} else if (res.result === "hit") {
         setBoard((b) => ({ ...b, [coord]: "hit" }));
         showMsg(`${coord} — ENCERT! 🎯`, "hit");
         addLog("hit", `${coord} → Encert`);

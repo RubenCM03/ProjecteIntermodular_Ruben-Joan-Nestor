@@ -82,6 +82,7 @@ export interface ShotResponse {
   game_over?: boolean;
   status?: string;
   sunk_ship?: string;
+  sunk_cells?: { row: number; col: number }[];
   sunk_size?: number;
 }
 export interface ApiCreateResponse {
