@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Logo from '../components/Logo'
 import { register, saveToken } from '../services/authService'
 import type { ApiError } from '../services/authService'
 import { useAuth } from '../context/AuthContext'

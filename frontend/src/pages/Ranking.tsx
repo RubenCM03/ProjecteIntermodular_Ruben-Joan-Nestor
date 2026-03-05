@@ -33,7 +33,7 @@ export default function Ranking() {
             <div className="card w-full max-w-lg animate-[fadeInUp_.6s_ease_.4s_forwards] opacity-0">
                 {loading && (
                     <div className="flex flex-col gap-2">
-                        {[1,2,3,4,5].map(i => (
+                        {[1, 2, 3, 4, 5].map(i => (
                             <div key={i} className="h-12 rounded-xl bg-sky-400/5 border border-sky-400/8 animate-pulse" />
                         ))}
                     </div>
@@ -53,13 +53,13 @@ export default function Ranking() {
 
                 {!loading && !error && ranking.length > 0 && (
                     <>
-                        {/* Header */}
                         <div className="flex items-center gap-2.5 px-3 pb-2 mb-1">
                             <span className="w-5" />
                             <span className="font-[Cinzel] text-[.5rem] tracking-[.2em] uppercase text-sky-400/30 flex-1">Jugador</span>
                             <span className="font-[Cinzel] text-[.5rem] tracking-[.2em] uppercase text-sky-400/30 w-6 text-center">V</span>
                             <span className="font-[Cinzel] text-[.5rem] tracking-[.2em] uppercase text-sky-400/30 w-14 text-center">Partides</span>
-                            <span className="font-[Cinzel] text-[.5rem] tracking-[.2em] uppercase text-sky-400/30 w-10 text-right">Millor</span>
+                            <span className="font-[Cinzel] text-[.5rem] tracking-[.2em] uppercase text-sky-400/30 w-10 text-right">Millor
+                            </span>
                         </div>
 
                         <div className="h-px bg-linear-to-r from-transparent via-sky-400/12 to-transparent mb-2" />
@@ -94,7 +94,7 @@ export default function Ranking() {
                                             {entry.total_games}
                                         </span>
                                         <span className="font-[Cinzel] text-[.65rem] text-sky-300/60 w-10 text-right flex-shrink-0">
-                                            {entry.best_score ?? '—'}🎯
+                                            {entry.best_score ?? '—'}
                                         </span>
                                     </div>
                                 )
